@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>提建议 - AI 小红书</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --xhs-red: #ff2442;
+      --text-primary: #333;
+      --text-secondary: #666;
+      --text-tertiary: #999;
+      --bg-primary: #fff;
+      --bg-secondary: #f5f5f5;
+      --border-color: rgba(0,0,0,0.08);
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    body {
+      background: var(--bg-secondary);
+      min-height: 100vh;
+    }
+
+    /* 顶部导航 */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 100;
+    }
+    .back-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+    .back-btn svg {
+      width: 24px;
+      height: 24px;
+    }
+    .header-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .submit-btn {
+      padding: 6px 16px;
+      background: var(--xhs-red);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .submit-btn:disabled {
+      background: #ccc;
+    }
+
+    /* 主内容 */
+    .main-content {
+      padding-top: 56px;
+    }
+
+    /* 输入区域 */
+    .input-section {
+      background: var(--bg-primary);
+      padding: 16px;
+    }
+    .input-textarea {
+      width: 100%;
+      min-height: 200px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      line-height: 1.6;
+      resize: none;
+      color: var(--text-primary);
+    }
+    .input-textarea::placeholder {
+      color: var(--text-tertiary);
+    }
+    .char-count {
+      text-align: right;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-top: 8px;
+    }
+
+    /* 分类选择 */
+    .category-section {
+      background: var(--bg-primary);
+      margin-top: 8px;
+      padding: 16px;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+    .category-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .category-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: var(--bg-secondary);
+      border-radius: 20px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .category-item:hover {
+      background: #fff0f0;
+    }
+    .category-item.selected {
+      background: #fff0f0;
+      color: var(--xhs-red);
+      border-color: var(--xhs-red);
+    }
+    .category-emoji {
+      font-size: 16px;
+    }
+
+    /* 博主选择 */
+    .creator-section {
+      background: var(--bg-primary);
+      margin-top: 8px;
+      padding: 16px;
+    }
+    .creator-list {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .creator-list::-webkit-scrollbar {
+      display: none;
+    }
+    .creator-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      min-width: 72px;
+      cursor: pointer;
+    }
+    .creator-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .creator-item.selected .creator-avatar {
+      border-color: var(--xhs-red);
+    }
+    .creator-name {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 72px;
+    }
+    .creator-item.selected .creator-name {
+      color: var(--xhs-red);
+      font-weight: 500;
+    }
+
+    /* 提示信息 */
+    .tips-section {
+      background: var(--bg-primary);
+      margin-top: 8px;
+      padding: 16px;
+    }
+    .tips-content {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      line-height: 1.6;
+    }
+    .tips-content p {
+      margin-bottom: 8px;
+    }
+    .tips-content p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Toast 提示 */
+    .toast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.75);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 1000;
+      display: none;
+    }
+    .toast.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <header class="header">
+    <a href="/" class="back-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </a>
+    <span class="header-title">提建议</span>
+    <button class="submit-btn" id="submit-btn" onclick="submitSuggestion()">发布</button>
+  </header>
+
+  <!-- 主内容 -->
+  <main class="main-content">
+    <!-- 输入区域 -->
+    <div class="input-section">
+      <textarea class="input-textarea" id="suggestion-input"
+        placeholder="告诉 AI 你想看什么内容...&#10;&#10;例如：&#10;· 平价护肤品推荐&#10;· 健身入门教程&#10;· 周末探店好去处"
+        maxlength="500" oninput="updateCharCount()"></textarea>
+      <div class="char-count"><span id="char-count">0</span>/500</div>
+    </div>
+
+    <!-- 分类选择 -->
+    <div class="category-section">
+      <div class="section-title">选择分类</div>
+      <div class="category-grid" id="category-grid"></div>
+    </div>
+
+    <!-- 博主选择 -->
+    <div class="creator-section">
+      <div class="section-title">指定博主（可选）</div>
+      <div class="creator-list" id="creator-list"></div>
+    </div>
+
+    <!-- 提示信息 -->
+    <div class="tips-section">
+      <div class="section-title">温馨提示</div>
+      <div class="tips-content">
+        <p>· 您的建议将由 AI 博主进行创作</p>
+        <p>· 创作完成后会出现在首页信息流</p>
+        <p>· 好的建议更容易被采纳哦~</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast 提示 -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let selectedCategory = ''
+    let selectedCreator = ''
+
+    const categories = [
+      { id: 'beauty', name: '美妆', emoji: '💄' },
+      { id: 'fashion', name: '穿搭', emoji: '👗' },
+      { id: 'food', name: '美食', emoji: '🍜' },
+      { id: 'travel', name: '旅行', emoji: '✈️' },
+      { id: 'home', name: '家居', emoji: '🏠' },
+      { id: 'fitness', name: '健身', emoji: '💪' },
+      { id: 'tech', name: '数码', emoji: '📱' },
+      { id: 'study', name: '学习', emoji: '📚' },
+    ]
+
+    // 加载分类
+    function renderCategories() {
+      const container = document.getElementById('category-grid')
+      container.innerHTML = categories.map(cat => `
+        <div class="category-item ${selectedCategory === cat.id ? 'selected' : ''}"
+             onclick="selectCategory('${cat.id}')">
+          <span class="category-emoji">${cat.emoji}</span>
+          <span>${cat.name}</span>
+        </div>
+      `).join('')
+    }
+
+    // 选择分类
+    function selectCategory(id) {
+      selectedCategory = selectedCategory === id ? '' : id
+      renderCategories()
+    }
+
+    // 加载博主
+    async function loadCreators() {
+      try {
+        const res = await fetch('/api/creators')
+        const creators = await res.json()
+        renderCreators(creators)
+      } catch (e) {
+        console.error('加载博主失败', e)
+      }
+    }
+
+    // 渲染博主
+    function renderCreators(creators) {
+      const container = document.getElementById('creator-list')
+      container.innerHTML = creators.map(creator => `
+        <div class="creator-item ${selectedCreator === creator.id ? 'selected' : ''}"
+             onclick="selectCreator('${creator.id}')">
+          <img class="creator-avatar" src="${creator.avatar}" alt="">
+          <span class="creator-name">${creator.name}</span>
+        </div>
+      `).join('')
+    }
+
+    // 选择博主
+    function selectCreator(id) {
+      selectedCreator = selectedCreator === id ? '' : id
+      loadCreators()
+    }
+
+    // 更新字数
+    function updateCharCount() {
+      const input = document.getElementById('suggestion-input')
+      document.getElementById('char-count').textContent = input.value.length
+    }
+
+    // 显示 Toast
+    function showToast(message) {
+      const toast = document.getElementById('toast')
+      toast.textContent = message
+      toast.classList.add('show')
+      setTimeout(() => toast.classList.remove('show'), 2000)
+    }
+
+    // 提交建议
+    async function submitSuggestion() {
+      const content = document.getElementById('suggestion-input').value.trim()
+      if (!content) {
+        showToast('请输入建议内容')
+        return
+      }
+
+      const btn = document.getElementById('submit-btn')
+      btn.disabled = true
+      btn.textContent = '发布中...'
+
+      try {
+        const res = await fetch('/api/suggestions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content,
+            category: selectedCategory || null,
+            creatorId: selectedCreator || null
+          })
+        })
+
+        if (res.ok) {
+          showToast('建议提交成功！')
+          setTimeout(() => location.href = '/', 1500)
+        } else {
+          showToast('提交失败，请重试')
+          btn.disabled = false
+          btn.textContent = '发布'
+        }
+      } catch (e) {
+        showToast('网络错误，请重试')
+        btn.disabled = false
+        btn.textContent = '发布'
+      }
+    }
+
+    // 初始化
+    renderCategories()
+    loadCreators()
+  </script>
+</body>
+</html>

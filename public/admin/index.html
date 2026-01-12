@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>后台管理 - AI 小红书</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --xhs-red: #ff2442;
+      --text-primary: #333;
+      --text-secondary: #666;
+      --text-tertiary: #999;
+      --bg-primary: #fff;
+      --bg-secondary: #f5f7fa;
+      --border-color: #e4e7ed;
+      --sidebar-width: 220px;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    body {
+      background: var(--bg-secondary);
+      min-height: 100vh;
+    }
+
+    /* 侧边栏 */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: var(--sidebar-width);
+      height: 100vh;
+      background: var(--bg-primary);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--xhs-red);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .logo-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 12px;
+      overflow-y: auto;
+    }
+    .nav-section {
+      margin-bottom: 24px;
+    }
+    .nav-section-title {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      padding: 8px 12px;
+      text-transform: uppercase;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      margin-bottom: 4px;
+      transition: all 0.2s;
+    }
+    .nav-item:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+    .nav-item.active {
+      background: #fff0f0;
+      color: var(--xhs-red);
+    }
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+    }
+    .nav-item span {
+      font-size: 14px;
+    }
+    .nav-badge {
+      margin-left: auto;
+      padding: 2px 8px;
+      background: var(--xhs-red);
+      color: white;
+      border-radius: 10px;
+      font-size: 11px;
+    }
+
+    /* 主内容区 */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      min-height: 100vh;
+    }
+
+    /* 顶部栏 */
+    .topbar {
+      height: 60px;
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .topbar-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .topbar-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: var(--xhs-red);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .topbar-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* 内容区域 */
+    .content {
+      padding: 24px;
+    }
+
+    /* 统计卡片 */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--bg-primary);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid var(--border-color);
+    }
+    .stat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .stat-icon.notes { background: #fff0f0; }
+    .stat-icon.creators { background: #e8f4ff; }
+    .stat-icon.views { background: #f0fff4; }
+    .stat-icon.suggestions { background: #fff8e6; }
+    .stat-trend {
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    .stat-trend.up { background: #f0fff4; color: #52c41a; }
+    .stat-trend.down { background: #fff0f0; color: #ff4d4f; }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+
+    /* 卡片容器 */
+    .card {
+      background: var(--bg-primary);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 24px;
+    }
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .card-action {
+      font-size: 13px;
+      color: var(--xhs-red);
+      text-decoration: none;
+    }
+    .card-body {
+      padding: 20px;
+    }
+
+    /* 表格 */
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .table th, .table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .table th {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      background: var(--bg-secondary);
+    }
+    .table td {
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+    .table tr:last-child td {
+      border-bottom: none;
+    }
+    .table-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+    .table-status {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+    .table-status.published { background: #f0fff4; color: #52c41a; }
+    .table-status.pending { background: #fff8e6; color: #faad14; }
+    .table-status.rejected { background: #fff0f0; color: #ff4d4f; }
+    .table-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .table-actions button {
+      padding: 4px 10px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-primary);
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
+    .table-actions button:hover {
+      background: var(--bg-secondary);
+    }
+    .table-actions button.danger {
+      color: var(--xhs-red);
+      border-color: var(--xhs-red);
+    }
+
+    /* 两栏布局 */
+    .two-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    /* 建议列表 */
+    .suggestion-item {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .suggestion-item:last-child {
+      border-bottom: none;
+    }
+    .suggestion-content {
+      font-size: 14px;
+      color: var(--text-primary);
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+    .suggestion-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+    .suggestion-category {
+      padding: 2px 8px;
+      background: var(--bg-secondary);
+      border-radius: 10px;
+    }
+    .suggestion-actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+    }
+    .suggestion-actions button {
+      padding: 6px 14px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .suggestion-actions .generate-btn {
+      background: var(--xhs-red);
+      color: white;
+    }
+    .suggestion-actions .reject-btn {
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+    }
+
+    /* 响应式 */
+    @media (max-width: 1200px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .two-columns {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+      .main-content {
+        margin-left: 0;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="/admin/" class="sidebar-logo">
+        <div class="logo-icon">AI</div>
+        <span class="logo-text">小红书后台</span>
+      </a>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">概览</div>
+        <a href="/admin/" class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          <span>仪表盘</span>
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">内容管理</div>
+        <a href="/admin/notes.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+          </svg>
+          <span>笔记管理</span>
+        </a>
+        <a href="/admin/suggestions.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span>建议管理</span>
+          <span class="nav-badge" id="suggestion-count">0</span>
+        </a>
+        <a href="/admin/creators.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span>博主管理</span>
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">AI 生成</div>
+        <a href="/admin/generate.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          <span>AI 创作</span>
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">其他</div>
+        <a href="/" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+          <span>访问前台</span>
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- 主内容区 -->
+  <main class="main-content">
+    <div class="topbar">
+      <h1 class="topbar-title">仪表盘</h1>
+      <div class="topbar-actions">
+        <button class="topbar-btn" onclick="location.href='/admin/generate.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          AI 生成笔记
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- 统计卡片 -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon notes">📝</div>
+            <span class="stat-trend up">+12%</span>
+          </div>
+          <div class="stat-value" id="stat-notes">0</div>
+          <div class="stat-label">笔记总数</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon creators">👤</div>
+            <span class="stat-trend up">+0%</span>
+          </div>
+          <div class="stat-value" id="stat-creators">0</div>
+          <div class="stat-label">AI 博主</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon views">👁️</div>
+            <span class="stat-trend up">+25%</span>
+          </div>
+          <div class="stat-value" id="stat-views">0</div>
+          <div class="stat-label">总浏览量</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon suggestions">💡</div>
+          </div>
+          <div class="stat-value" id="stat-suggestions">0</div>
+          <div class="stat-label">待处理建议</div>
+        </div>
+      </div>
+
+      <!-- 两栏布局 -->
+      <div class="two-columns">
+        <!-- 最新笔记 -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">最新笔记</span>
+            <a href="/admin/notes.html" class="card-action">查看全部 →</a>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>标题</th>
+                  <th>博主</th>
+                  <th>状态</th>
+                </tr>
+              </thead>
+              <tbody id="recent-notes"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 最新建议 -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">最新建议</span>
+            <a href="/admin/suggestions.html" class="card-action">查看全部 →</a>
+          </div>
+          <div class="card-body" id="recent-suggestions"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // 加载统计数据
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/admin/stats')
+        const stats = await res.json()
+        document.getElementById('stat-notes').textContent = stats.notes
+        document.getElementById('stat-creators').textContent = stats.creators
+        document.getElementById('stat-views').textContent = formatNumber(stats.views)
+        document.getElementById('stat-suggestions').textContent = stats.pendingSuggestions
+        document.getElementById('suggestion-count').textContent = stats.pendingSuggestions
+      } catch (e) {
+        console.error('加载统计失败', e)
+      }
+    }
+
+    // 加载最新笔记
+    async function loadRecentNotes() {
+      try {
+        const res = await fetch('/api/feed?limit=5')
+        const notes = await res.json()
+        const tbody = document.getElementById('recent-notes')
+
+        tbody.innerHTML = notes.map(note => `
+          <tr>
+            <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              ${escapeHtml(note.title)}
+            </td>
+            <td>
+              <img class="table-avatar" src="${note.creator_avatar}" alt="">
+              ${escapeHtml(note.creator_name)}
+            </td>
+            <td><span class="table-status published">已发布</span></td>
+          </tr>
+        `).join('')
+      } catch (e) {
+        console.error('加载笔记失败', e)
+      }
+    }
+
+    // 加载最新建议
+    async function loadRecentSuggestions() {
+      try {
+        const res = await fetch('/api/suggestions?limit=5')
+        const suggestions = await res.json()
+        const container = document.getElementById('recent-suggestions')
+
+        if (suggestions.length === 0) {
+          container.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">暂无建议</div>'
+          return
+        }
+
+        container.innerHTML = suggestions.slice(0, 5).map(s => `
+          <div class="suggestion-item">
+            <div class="suggestion-content">${escapeHtml(s.content)}</div>
+            <div class="suggestion-meta">
+              ${s.category ? `<span class="suggestion-category">${getCategoryName(s.category)}</span>` : ''}
+              <span>${formatDate(s.created_at)}</span>
+            </div>
+            <div class="suggestion-actions">
+              <button class="generate-btn" onclick="generateFromSuggestion('${s.id}', '${escapeHtml(s.content)}')">AI 生成</button>
+              <button class="reject-btn" onclick="rejectSuggestion('${s.id}')">忽略</button>
+            </div>
+          </div>
+        `).join('')
+      } catch (e) {
+        console.error('加载建议失败', e)
+      }
+    }
+
+    function getCategoryName(id) {
+      const map = {
+        'beauty': '美妆', 'fashion': '穿搭', 'food': '美食',
+        'travel': '旅行', 'home': '家居', 'fitness': '健身',
+        'tech': '数码', 'study': '学习'
+      }
+      return map[id] || id
+    }
+
+    function formatDate(dateStr) {
+      const date = new Date(dateStr)
+      const now = new Date()
+      const diff = now - date
+      const hours = Math.floor(diff / (1000 * 60 * 60))
+      if (hours < 1) return '刚刚'
+      if (hours < 24) return `${hours}小时前`
+      const days = Math.floor(hours / 24)
+      if (days < 7) return `${days}天前`
+      return date.toLocaleDateString('zh-CN')
+    }
+
+    function formatNumber(num) {
+      if (num >= 10000) return (num / 10000).toFixed(1) + 'w'
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'k'
+      return num
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div')
+      div.textContent = text
+      return div.innerHTML
+    }
+
+    function generateFromSuggestion(id, content) {
+      location.href = `/admin/generate.html?suggestion=${id}&topic=${encodeURIComponent(content)}`
+    }
+
+    async function rejectSuggestion(id) {
+      if (!confirm('确定要忽略这条建议吗？')) return
+      try {
+        await fetch(`/api/admin/suggestions/${id}`, {
+          method: 'DELETE'
+        })
+        loadRecentSuggestions()
+        loadStats()
+      } catch (e) {
+        alert('操作失败')
+      }
+    }
+
+    // 初始化
+    loadStats()
+    loadRecentNotes()
+    loadRecentSuggestions()
+  </script>
+</body>
+</html>

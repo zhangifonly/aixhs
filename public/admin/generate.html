@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 创作 - AI 小红书后台</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --xhs-red: #ff2442;
+      --text-primary: #333;
+      --text-secondary: #666;
+      --text-tertiary: #999;
+      --bg-primary: #fff;
+      --bg-secondary: #f5f7fa;
+      --border-color: #e4e7ed;
+      --sidebar-width: 220px;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    body {
+      background: var(--bg-secondary);
+      min-height: 100vh;
+    }
+
+    /* 侧边栏 - 与 index.html 相同 */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: var(--sidebar-width);
+      height: 100vh;
+      background: var(--bg-primary);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--xhs-red);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .logo-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 12px;
+      overflow-y: auto;
+    }
+    .nav-section {
+      margin-bottom: 24px;
+    }
+    .nav-section-title {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      padding: 8px 12px;
+      text-transform: uppercase;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      margin-bottom: 4px;
+      transition: all 0.2s;
+    }
+    .nav-item:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+    .nav-item.active {
+      background: #fff0f0;
+      color: var(--xhs-red);
+    }
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+    }
+    .nav-item span {
+      font-size: 14px;
+    }
+
+    /* 主内容区 */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      min-height: 100vh;
+    }
+
+    /* 顶部栏 */
+    .topbar {
+      height: 60px;
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .topbar-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* 内容区域 */
+    .content {
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 24px;
+    }
+
+    /* 卡片 */
+    .card {
+      background: var(--bg-primary);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .card-body {
+      padding: 20px;
+    }
+
+    /* 表单 */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus {
+      border-color: var(--xhs-red);
+    }
+    .form-textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--text-primary);
+      outline: none;
+      resize: vertical;
+      min-height: 80px;
+    }
+    .form-textarea:focus {
+      border-color: var(--xhs-red);
+    }
+
+    /* 博主选择 */
+    .creator-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .creator-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 8px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .creator-option:hover {
+      border-color: #ffc0c0;
+    }
+    .creator-option.selected {
+      border-color: var(--xhs-red);
+      background: #fff0f0;
+    }
+    .creator-option img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      margin-bottom: 8px;
+    }
+    .creator-option span {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    /* 板块和细分话题选择 */
+    .category-select {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .category-chip {
+      padding: 6px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .category-chip:hover {
+      border-color: #ffc0c0;
+      background: #fff8f8;
+    }
+    .category-chip.selected {
+      border-color: var(--xhs-red);
+      background: #fff0f0;
+      color: var(--xhs-red);
+    }
+    .subtopic-section {
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      display: none;
+    }
+    .subtopic-section.visible {
+      display: block;
+    }
+    .subtopic-label {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+    }
+    .subtopic-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .subtopic-chip {
+      padding: 4px 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      background: white;
+      transition: all 0.2s;
+    }
+    .subtopic-chip:hover {
+      border-color: #ffc0c0;
+    }
+    .subtopic-chip.selected {
+      border-color: var(--xhs-red);
+      background: #fff0f0;
+      color: var(--xhs-red);
+    }
+    .seasonal-tips {
+      margin-top: 12px;
+      padding: 10px;
+      background: linear-gradient(135deg, #fff0f0 0%, #fff8f0 100%);
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .seasonal-tips strong {
+      color: var(--xhs-red);
+    }
+
+    /* 生成按钮 */
+    .generate-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--xhs-red);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .generate-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .generate-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* 预览区域 */
+    .preview-section {
+      height: calc(100vh - 108px);
+      overflow-y: auto;
+    }
+    .preview-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 400px;
+      color: var(--text-tertiary);
+    }
+    .preview-empty svg {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    .preview-empty p {
+      font-size: 14px;
+    }
+
+    /* 预览卡片 */
+    .preview-card {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .preview-cover {
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+    }
+    .preview-content {
+      padding: 20px;
+    }
+    .preview-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+    .preview-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      white-space: pre-wrap;
+      margin-bottom: 16px;
+    }
+    .preview-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .preview-tag {
+      font-size: 13px;
+      color: #2f7cf5;
+    }
+
+    /* 生成状态 */
+    .generating-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+    .generating-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border-color);
+      border-top-color: var(--xhs-red);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .generating-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    .generating-content {
+      margin-top: 20px;
+      padding: 20px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      width: 100%;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .generating-content pre {
+      font-size: 14px;
+      color: var(--text-primary);
+      white-space: pre-wrap;
+      margin: 0;
+    }
+
+    /* 操作按钮 */
+    .preview-actions {
+      display: flex;
+      gap: 12px;
+    }
+    .preview-actions button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .publish-btn {
+      background: var(--xhs-red);
+      color: white;
+    }
+    .regenerate-btn {
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 1200px) {
+      .content {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+      .main-content {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="/admin/" class="sidebar-logo">
+        <div class="logo-icon">AI</div>
+        <span class="logo-text">小红书后台</span>
+      </a>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">概览</div>
+        <a href="/admin/" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          <span>仪表盘</span>
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">内容管理</div>
+        <a href="/admin/notes.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span>笔记管理</span>
+        </a>
+        <a href="/admin/suggestions.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span>建议管理</span>
+        </a>
+        <a href="/admin/creators.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+          </svg>
+          <span>博主管理</span>
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">AI 生成</div>
+        <a href="/admin/generate.html" class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          <span>AI 创作</span>
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">其他</div>
+        <a href="/" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+          <span>访问前台</span>
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- 主内容区 -->
+  <main class="main-content">
+    <div class="topbar">
+      <h1 class="topbar-title">AI 创作</h1>
+    </div>
+
+    <div class="content">
+      <!-- 左侧表单 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">创作设置</span>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">选择博主</label>
+            <div class="creator-grid" id="creator-grid"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">选择板块（可选）</label>
+            <div class="category-select" id="category-select"></div>
+            <div class="subtopic-section" id="subtopic-section">
+              <div class="subtopic-label">细分话题</div>
+              <div class="subtopic-grid" id="subtopic-grid"></div>
+            </div>
+            <div class="seasonal-tips" id="seasonal-tips" style="display: none;"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">创作主题</label>
+            <input type="text" class="form-input" id="topic-input"
+              placeholder="例如：冬季护肤、减脂食谱、旅行攻略...">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">补充说明（可选）</label>
+            <textarea class="form-textarea" id="extra-input"
+              placeholder="添加额外的创作要求或参考信息..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" style="display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="generate-cover" checked style="width: 16px; height: 16px;">
+              <span>AI 生成封面图</span>
+              <span id="comfyui-status" style="font-size: 12px; color: var(--text-tertiary);"></span>
+            </label>
+          </div>
+
+          <button class="generate-btn" id="generate-btn" onclick="generateNote()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+            开始 AI 创作
+          </button>
+        </div>
+      </div>
+
+      <!-- 右侧预览 -->
+      <div class="card preview-section">
+        <div class="card-header">
+          <span class="card-title">创作预览</span>
+        </div>
+        <div class="card-body" id="preview-area">
+          <div class="preview-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            <p>选择博主和主题，开始 AI 创作</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let selectedCreator = ''
+    let selectedCategory = ''
+    let selectedSubTopic = ''
+    let creators = []
+    let categories = []
+    let currentSubTopics = []
+    let generatedNote = null
+
+    const coverGradients = [
+      'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+      'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+    ]
+
+    const categoryEmoji = {
+      'beauty': '💄', 'fashion': '👗', 'food': '🍜',
+      'travel': '✈️', 'home': '🏠', 'fitness': '💪',
+      'tech': '📱', 'study': '📚'
+    }
+
+    // 加载博主
+    async function loadCreators() {
+      try {
+        const res = await fetch('/api/creators')
+        creators = await res.json()
+        renderCreators()
+      } catch (e) {
+        console.error('加载博主失败', e)
+      }
+    }
+
+    // 加载板块
+    async function loadCategories() {
+      try {
+        const res = await fetch('/api/categories')
+        categories = await res.json()
+        renderCategories()
+      } catch (e) {
+        console.error('加载板块失败', e)
+      }
+    }
+
+    // 渲染板块选项
+    function renderCategories() {
+      const container = document.getElementById('category-select')
+      container.innerHTML = categories
+        .filter(c => c.id !== 'recommend')
+        .map(cat => `
+          <div class="category-chip ${selectedCategory === cat.id ? 'selected' : ''}"
+               onclick="selectCategory('${cat.id}')">
+            <span>${cat.icon}</span>
+            <span>${cat.name}</span>
+          </div>
+        `).join('')
+    }
+
+    // 选择板块
+    async function selectCategory(id) {
+      if (selectedCategory === id) {
+        // 取消选择
+        selectedCategory = ''
+        selectedSubTopic = ''
+        currentSubTopics = []
+        renderCategories()
+        document.getElementById('subtopic-section').classList.remove('visible')
+        document.getElementById('seasonal-tips').style.display = 'none'
+        return
+      }
+
+      selectedCategory = id
+      selectedSubTopic = ''
+      renderCategories()
+
+      // 加载细分话题和建议
+      try {
+        const [subTopicsRes, suggestionsRes] = await Promise.all([
+          fetch(`/api/categories/${id}/subtopics`),
+          fetch(`/api/categories/${id}/suggestions`)
+        ])
+        currentSubTopics = await subTopicsRes.json()
+        const suggestions = await suggestionsRes.json()
+
+        renderSubTopics()
+        renderSeasonalTips(suggestions.seasonal)
+      } catch (e) {
+        console.error('加载细分话题失败', e)
+      }
+    }
+
+    // 渲染细分话题
+    function renderSubTopics() {
+      const section = document.getElementById('subtopic-section')
+      const grid = document.getElementById('subtopic-grid')
+
+      if (currentSubTopics.length === 0) {
+        section.classList.remove('visible')
+        return
+      }
+
+      grid.innerHTML = currentSubTopics.map(st => `
+        <div class="subtopic-chip ${selectedSubTopic === st.id ? 'selected' : ''}"
+             onclick="selectSubTopic('${st.id}')">
+          ${st.name}
+        </div>
+      `).join('')
+
+      section.classList.add('visible')
+    }
+
+    // 选择细分话题
+    function selectSubTopic(id) {
+      if (selectedSubTopic === id) {
+        selectedSubTopic = ''
+      } else {
+        selectedSubTopic = id
+      }
+      renderSubTopics()
+    }
+
+    // 渲染当季热门提示
+    function renderSeasonalTips(seasonal) {
+      const tips = document.getElementById('seasonal-tips')
+      if (!seasonal || seasonal.length === 0) {
+        tips.style.display = 'none'
+        return
+      }
+
+      tips.innerHTML = `
+        <strong>🔥 当季热门：</strong>${seasonal.slice(0, 3).join('、')}
+      `
+      tips.style.display = 'block'
+    }
+
+    // 渲染博主选项
+    function renderCreators() {
+      const container = document.getElementById('creator-grid')
+      container.innerHTML = creators.map(creator => `
+        <div class="creator-option ${selectedCreator === creator.id ? 'selected' : ''}"
+             onclick="selectCreator('${creator.id}')">
+          <img src="${creator.avatar}" alt="">
+          <span>${creator.name}</span>
+        </div>
+      `).join('')
+    }
+
+    // 选择博主
+    function selectCreator(id) {
+      selectedCreator = id
+      renderCreators()
+    }
+
+    // 生成笔记
+    async function generateNote() {
+      const topic = document.getElementById('topic-input').value.trim()
+
+      if (!selectedCreator) {
+        alert('请选择博主')
+        return
+      }
+      if (!topic) {
+        alert('请输入创作主题')
+        return
+      }
+
+      const btn = document.getElementById('generate-btn')
+      btn.disabled = true
+      btn.innerHTML = '<span class="generating-spinner" style="width:18px;height:18px;border-width:2px;margin:0;"></span> 生成中...'
+
+      // 显示生成状态
+      const previewArea = document.getElementById('preview-area')
+      previewArea.innerHTML = `
+        <div class="generating-state">
+          <div class="generating-spinner"></div>
+          <div class="generating-text">AI 正在创作中，请稍候...</div>
+          <div class="generating-content">
+            <pre id="stream-content"></pre>
+          </div>
+        </div>
+      `
+
+      try {
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            creatorId: selectedCreator,
+            topic: topic,
+            categoryId: selectedCategory || undefined,
+            subTopicId: selectedSubTopic || undefined
+          })
+        })
+
+        const reader = res.body.getReader()
+        const decoder = new TextDecoder()
+        let fullContent = ''
+
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          const chunk = decoder.decode(value)
+          const lines = chunk.split('\n')
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(line.slice(6))
+                if (data.type === 'content') {
+                  fullContent += data.content
+                  document.getElementById('stream-content').textContent = fullContent
+                } else if (data.type === 'done') {
+                  generatedNote = data.note
+                  renderPreview()
+                } else if (data.type === 'error') {
+                  throw new Error(data.message)
+                }
+              } catch (e) {
+                // 解析错误，跳过
+              }
+            }
+          }
+        }
+      } catch (e) {
+        previewArea.innerHTML = `
+          <div class="preview-empty">
+            <p style="color: #ff4d4f;">生成失败：${e.message}</p>
+          </div>
+        `
+      }
+
+      btn.disabled = false
+      btn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+        开始 AI 创作
+      `
+    }
+
+    // 渲染预览
+    function renderPreview() {
+      if (!generatedNote) return
+
+      const creator = creators.find(c => c.id === selectedCreator)
+      const gradient = coverGradients[Math.floor(Math.random() * coverGradients.length)]
+      const emoji = categoryEmoji[creator?.category] || '📝'
+      const tags = generatedNote.tags || []
+
+      const previewArea = document.getElementById('preview-area')
+      previewArea.innerHTML = `
+        <div class="preview-card">
+          <div class="preview-cover" style="background: ${gradient}">
+            ${emoji}
+          </div>
+          <div class="preview-content">
+            <div class="preview-title">${escapeHtml(generatedNote.title)}</div>
+            <div class="preview-text">${escapeHtml(generatedNote.content)}</div>
+            <div class="preview-tags">
+              ${tags.map(t => `<span class="preview-tag">${escapeHtml(t)}</span>`).join('')}
+            </div>
+            <div class="preview-actions">
+              <button class="publish-btn" onclick="publishNote()">发布笔记</button>
+              <button class="regenerate-btn" onclick="generateNote()">重新生成</button>
+            </div>
+          </div>
+        </div>
+      `
+    }
+
+    // 发布笔记
+    async function publishNote() {
+      if (!generatedNote) return
+
+      const generateCover = document.getElementById('generate-cover').checked
+      const publishBtn = document.querySelector('.publish-btn')
+      const originalText = publishBtn.textContent
+
+      try {
+        if (generateCover) {
+          publishBtn.textContent = '生成封面中...'
+          publishBtn.disabled = true
+        }
+
+        const res = await fetch('/api/admin/notes/with-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            creatorId: selectedCreator,
+            title: generatedNote.title,
+            content: generatedNote.content,
+            tags: generatedNote.tags,
+            category: selectedCategory || creators.find(c => c.id === selectedCreator)?.category,
+            generateCover: generateCover
+          })
+        })
+
+        const result = await res.json()
+
+        if (res.ok) {
+          if (result.coverImage) {
+            alert('发布成功！已生成 AI 封面图')
+          } else {
+            alert('发布成功！')
+          }
+          location.href = '/admin/notes.html'
+        } else {
+          alert('发布失败: ' + (result.error || '未知错误'))
+        }
+      } catch (e) {
+        alert('发布失败：' + e.message)
+      } finally {
+        publishBtn.textContent = originalText
+        publishBtn.disabled = false
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div')
+      div.textContent = text
+      return div.innerHTML
+    }
+
+    // 检查 ComfyUI 状态
+    async function checkComfyUIStatus() {
+      try {
+        const res = await fetch('/api/comfyui/health')
+        const data = await res.json()
+        const statusEl = document.getElementById('comfyui-status')
+        if (data.status === 'online') {
+          statusEl.innerHTML = '(<span style="color: #52c41a;">●</span> 绘图服务在线)'
+        } else {
+          statusEl.innerHTML = '(<span style="color: #ff4d4f;">●</span> 绘图服务离线)'
+          document.getElementById('generate-cover').checked = false
+        }
+      } catch (e) {
+        document.getElementById('comfyui-status').innerHTML = '(<span style="color: #ff4d4f;">●</span> 绘图服务离线)'
+        document.getElementById('generate-cover').checked = false
+      }
+    }
+
+    // 初始化
+    loadCreators()
+    loadCategories()
+    checkComfyUIStatus()
+
+    // 检查 URL 参数
+    const params = new URLSearchParams(location.search)
+    const topicParam = params.get('topic')
+    if (topicParam) {
+      document.getElementById('topic-input').value = topicParam
+    }
+  </script>
+</body>
+</html>

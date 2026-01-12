@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>发现 - AI 小红书</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --xhs-red: #ff2442;
+      --text-primary: #333;
+      --text-secondary: #666;
+      --text-tertiary: #999;
+      --bg-primary: #fff;
+      --bg-secondary: #f5f5f5;
+      --border-color: rgba(0,0,0,0.08);
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    body {
+      background: var(--bg-secondary);
+      min-height: 100vh;
+      padding-bottom: 70px;
+    }
+
+    /* 顶部搜索栏 */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: var(--bg-primary);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 12px;
+      z-index: 100;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .search-box {
+      flex: 1;
+      height: 36px;
+      background: var(--bg-secondary);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 8px;
+      cursor: pointer;
+    }
+    .search-box svg {
+      width: 18px;
+      height: 18px;
+      color: var(--text-tertiary);
+      flex-shrink: 0;
+    }
+    .search-box span {
+      font-size: 14px;
+      color: var(--text-tertiary);
+    }
+
+    /* 主内容区域 */
+    .main-content {
+      padding-top: 56px;
+    }
+
+    /* 轮播区域 */
+    .banner-section {
+      padding: 16px;
+      background: var(--bg-primary);
+    }
+    .banner-wrapper {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .banner-slide {
+      width: 100%;
+      aspect-ratio: 2.5/1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+      font-weight: 600;
+    }
+    .banner-dots {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+    }
+    .banner-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+    }
+    .banner-dot.active {
+      background: white;
+      width: 16px;
+      border-radius: 3px;
+    }
+
+    /* 分类入口 */
+    .category-section {
+      background: var(--bg-primary);
+      padding: 16px;
+      margin-top: 8px;
+    }
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+    .category-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .category-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    .category-name {
+      font-size: 12px;
+      color: var(--text-primary);
+    }
+
+    /* 热门话题 */
+    .section {
+      background: var(--bg-primary);
+      margin-top: 8px;
+      padding: 16px;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .section-more {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .section-more svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* 话题列表 */
+    .topic-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .topic-item {
+      display: flex;
+      gap: 12px;
+      cursor: pointer;
+    }
+    .topic-rank {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+      flex-shrink: 0;
+    }
+    .topic-rank.top1 { background: #ff2442; }
+    .topic-rank.top2 { background: #ff6b4a; }
+    .topic-rank.top3 { background: #ffa940; }
+    .topic-rank.normal { background: #ddd; color: #999; }
+    .topic-content {
+      flex: 1;
+      min-width: 0;
+    }
+    .topic-title {
+      font-size: 15px;
+      color: var(--text-primary);
+      font-weight: 500;
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .topic-meta {
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+    .topic-hot {
+      color: var(--xhs-red);
+      font-size: 12px;
+      margin-left: 8px;
+    }
+
+    /* 推荐博主 */
+    .creator-scroll {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .creator-scroll::-webkit-scrollbar {
+      display: none;
+    }
+    .creator-card {
+      min-width: 140px;
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .creator-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+    .creator-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+      text-align: center;
+    }
+    .creator-category {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-bottom: 10px;
+    }
+    .creator-stats {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-bottom: 10px;
+    }
+    .follow-btn {
+      padding: 6px 20px;
+      border-radius: 16px;
+      background: var(--xhs-red);
+      color: white;
+      font-size: 12px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+    }
+    .follow-btn.followed {
+      background: var(--bg-primary);
+      color: var(--text-tertiary);
+      border: 1px solid var(--border-color);
+    }
+
+    /* 精选笔记 */
+    .featured-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .featured-card {
+      background: var(--bg-secondary);
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .featured-cover {
+      width: 100%;
+      aspect-ratio: 1/1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+    .featured-info {
+      padding: 10px;
+    }
+    .featured-title {
+      font-size: 13px;
+      color: var(--text-primary);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .featured-author {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .featured-author-avatar {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+    }
+    .featured-author-name {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .featured-likes {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .featured-likes svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    /* 底部导航 */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: var(--bg-primary);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 100;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 6px 12px;
+      text-decoration: none;
+      color: var(--text-tertiary);
+    }
+    .nav-item.active {
+      color: var(--xhs-red);
+    }
+    .nav-item svg {
+      width: 24px;
+      height: 24px;
+    }
+    .nav-item span {
+      font-size: 10px;
+    }
+    .nav-item.publish {
+      color: var(--text-primary);
+    }
+    .nav-item.publish svg {
+      width: 32px;
+      height: 32px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部搜索栏 -->
+  <header class="header">
+    <a href="/search.html" class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <span>搜索小红书</span>
+    </a>
+  </header>
+
+  <!-- 主内容区域 -->
+  <main class="main-content">
+    <!-- 轮播区域 -->
+    <div class="banner-section">
+      <div class="banner-wrapper">
+        <div class="banner-slide" id="banner-slide" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+          AI 创作精选
+        </div>
+        <div class="banner-dots">
+          <div class="banner-dot active"></div>
+          <div class="banner-dot"></div>
+          <div class="banner-dot"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 分类入口 -->
+    <div class="category-section">
+      <div class="category-grid" id="category-grid"></div>
+    </div>
+
+    <!-- 热门话题 -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">🔥 热门话题</span>
+        <a href="#" class="section-more">
+          查看更多
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </a>
+      </div>
+      <div class="topic-list" id="topic-list"></div>
+    </div>
+
+    <!-- 推荐博主 -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">✨ 推荐博主</span>
+        <a href="#" class="section-more">
+          查看更多
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </a>
+      </div>
+      <div class="creator-scroll" id="creator-list"></div>
+    </div>
+
+    <!-- 精选笔记 -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">📝 精选笔记</span>
+      </div>
+      <div class="featured-grid" id="featured-list"></div>
+    </div>
+  </main>
+
+  <!-- 底部导航 -->
+  <nav class="bottom-nav">
+    <a href="/" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span>首页</span>
+    </a>
+    <a href="/discover.html" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5.5-2.5l7.51-3.49L17.5 6.5 9.99 9.99 6.5 17.5zm5.5-6.6c.61 0 1.1.49 1.1 1.1s-.49 1.1-1.1 1.1-1.1-.49-1.1-1.1.49-1.1 1.1-1.1z"/>
+      </svg>
+      <span>发现</span>
+    </a>
+    <a href="/suggest.html" class="nav-item publish">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+        <line x1="12" y1="8" x2="12" y2="16"/>
+        <line x1="8" y1="12" x2="16" y2="12"/>
+      </svg>
+      <span></span>
+    </a>
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      <span>消息</span>
+    </a>
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      <span>我</span>
+    </a>
+  </nav>
+
+  <script>
+    const categories = [
+      { id: 'beauty', name: '美妆', icon: '💄', color: '#ffe4e8' },
+      { id: 'fashion', name: '穿搭', icon: '👗', color: '#e8e4ff' },
+      { id: 'food', name: '美食', icon: '🍜', color: '#fff4e4' },
+      { id: 'travel', name: '旅行', icon: '✈️', color: '#e4f4ff' },
+      { id: 'home', name: '家居', icon: '🏠', color: '#e4ffe8' },
+      { id: 'fitness', name: '健身', icon: '💪', color: '#ffe8e4' },
+      { id: 'tech', name: '数码', icon: '📱', color: '#e4e8ff' },
+      { id: 'study', name: '学习', icon: '📚', color: '#fff8e4' },
+      { id: 'life', name: '生活', icon: '🌟', color: '#f4e4ff' },
+      { id: 'more', name: '更多', icon: '•••', color: '#f0f0f0' },
+    ]
+
+    const hotTopics = [
+      { title: '冬季护肤必备好物分享', heat: 128000, category: 'beauty' },
+      { title: '2024穿搭灵感合集', heat: 96000, category: 'fashion' },
+      { title: '一人食也要好好吃饭', heat: 85000, category: 'food' },
+      { title: '小众旅行目的地推荐', heat: 72000, category: 'travel' },
+      { title: '租房改造低成本方案', heat: 68000, category: 'home' },
+    ]
+
+    const coverGradients = [
+      'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+      'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+    ]
+
+    const categoryEmoji = {
+      'beauty': '💄', 'fashion': '👗', 'food': '🍜',
+      'travel': '✈️', 'home': '🏠', 'fitness': '💪',
+      'tech': '📱', 'study': '📚'
+    }
+
+    // 渲染分类入口
+    function renderCategories() {
+      const container = document.getElementById('category-grid')
+      container.innerHTML = categories.map(cat => `
+        <a href="/?category=${cat.id}" class="category-item">
+          <div class="category-icon" style="background: ${cat.color}">
+            ${cat.icon}
+          </div>
+          <span class="category-name">${cat.name}</span>
+        </a>
+      `).join('')
+    }
+
+    // 渲染热门话题
+    function renderTopics() {
+      const container = document.getElementById('topic-list')
+      container.innerHTML = hotTopics.map((topic, index) => {
+        let rankClass = 'normal'
+        if (index === 0) rankClass = 'top1'
+        else if (index === 1) rankClass = 'top2'
+        else if (index === 2) rankClass = 'top3'
+
+        return `
+          <div class="topic-item" onclick="searchTopic('${topic.title}')">
+            <div class="topic-rank ${rankClass}">${index + 1}</div>
+            <div class="topic-content">
+              <div class="topic-title">${topic.title}</div>
+              <div class="topic-meta">
+                ${formatNumber(topic.heat)} 浏览
+                <span class="topic-hot">热</span>
+              </div>
+            </div>
+          </div>
+        `
+      }).join('')
+    }
+
+    // 加载博主列表
+    async function loadCreators() {
+      try {
+        const res = await fetch('/api/creators')
+        const creators = await res.json()
+        renderCreators(creators)
+      } catch (e) {
+        console.error('加载博主失败', e)
+      }
+    }
+
+    // 渲染博主
+    function renderCreators(creators) {
+      const container = document.getElementById('creator-list')
+      container.innerHTML = creators.map(creator => `
+        <a href="/creator.html?id=${creator.id}" class="creator-card">
+          <img class="creator-avatar" src="${creator.avatar}" alt="">
+          <span class="creator-name">${creator.name}</span>
+          <span class="creator-category">${categoryEmoji[creator.category] || '📝'} ${getCategoryName(creator.category)}</span>
+          <span class="creator-stats">${Math.floor(Math.random() * 50 + 10)}篇笔记</span>
+          <button class="follow-btn" onclick="event.preventDefault();toggleFollow(this)">关注</button>
+        </a>
+      `).join('')
+    }
+
+    // 加载精选笔记
+    async function loadFeatured() {
+      try {
+        const res = await fetch('/api/feed?limit=4')
+        const notes = await res.json()
+        renderFeatured(notes)
+      } catch (e) {
+        console.error('加载精选失败', e)
+      }
+    }
+
+    // 渲染精选笔记
+    function renderFeatured(notes) {
+      const container = document.getElementById('featured-list')
+      container.innerHTML = notes.map((note, index) => {
+        const gradient = coverGradients[index % coverGradients.length]
+        const emoji = categoryEmoji[note.category] || '📝'
+        return `
+          <a href="/note.html?id=${note.id}" class="featured-card">
+            <div class="featured-cover" style="background: ${gradient}">
+              ${emoji}
+            </div>
+            <div class="featured-info">
+              <div class="featured-title">${escapeHtml(note.title)}</div>
+              <div class="featured-author">
+                <img class="featured-author-avatar" src="${note.creator_avatar}" alt="">
+                <span class="featured-author-name">${escapeHtml(note.creator_name)}</span>
+                <span class="featured-likes">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  </svg>
+                  ${formatNumber(note.likes)}
+                </span>
+              </div>
+            </div>
+          </a>
+        `
+      }).join('')
+    }
+
+    function getCategoryName(id) {
+      const map = {
+        'beauty': '美妆', 'fashion': '穿搭', 'food': '美食',
+        'travel': '旅行', 'home': '家居', 'fitness': '健身',
+        'tech': '数码', 'study': '学习'
+      }
+      return map[id] || '生活'
+    }
+
+    function formatNumber(num) {
+      if (num >= 10000) return (num / 10000).toFixed(1) + 'w'
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'k'
+      return num
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div')
+      div.textContent = text
+      return div.innerHTML
+    }
+
+    function toggleFollow(btn) {
+      if (btn.classList.contains('followed')) {
+        btn.classList.remove('followed')
+        btn.textContent = '关注'
+      } else {
+        btn.classList.add('followed')
+        btn.textContent = '已关注'
+      }
+    }
+
+    function searchTopic(topic) {
+      location.href = `/search.html?q=${encodeURIComponent(topic)}`
+    }
+
+    // 轮播图切换
+    const banners = [
+      { text: 'AI 创作精选', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+      { text: '每日话题推荐', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
+      { text: '发现更多精彩', gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' },
+    ]
+    let currentBanner = 0
+
+    function rotateBanner() {
+      currentBanner = (currentBanner + 1) % banners.length
+      const slide = document.getElementById('banner-slide')
+      slide.style.background = banners[currentBanner].gradient
+      slide.textContent = banners[currentBanner].text
+
+      document.querySelectorAll('.banner-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i === currentBanner)
+      })
+    }
+
+    setInterval(rotateBanner, 3000)
+
+    // 初始化
+    renderCategories()
+    renderTopics()
+    loadCreators()
+    loadFeatured()
+  </script>
+</body>
+</html>

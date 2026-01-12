@@ -1,0 +1,591 @@
+[
+  {
+    "id": "beauty",
+    "name": "美妆护肤",
+    "icon": "💄",
+    "nickname": "成分党",
+    "readerPsychology": {
+      "coreNeeds": ["解决肌肤问题", "找到适合自己的产品", "省钱不踩雷", "变美变自信"],
+      "likesToSee": ["真实使用前后对比", "成分分析和功效解读", "平价替代推荐", "针对具体肤质的建议"],
+      "dislikesToSee": ["明显的广告软文", "夸大效果的描述", "不说适用肤质", "只说好不说缺点"],
+      "triggerPoints": ["亲测有效", "回购N次", "平价大碗", "敏感肌可用", "成分安全"],
+      "trustSignals": ["使用周期说明", "具体肤质背景", "优缺点都说", "不是所有人都适合"]
+    },
+    "writingStrategy": {
+      "titleFormulas": [
+        "{肤质}亲妈！这款{产品}真的绝了",
+        "{问题}救星！用了{时间}终于好了",
+        "成分党分析｜{产品}到底值不值得买",
+        "{价格}以内最值得买的{数量}款{品类}",
+        "别再乱买了！{肤质}真正需要的是这些"
+      ],
+      "openingStyles": [
+        "姐妹们！！！今天必须给你们安利",
+        "作为一个{肤质}，我真的太懂{问题}的痛了",
+        "用了{数量}款{产品}，终于找到真爱了",
+        "这篇是我花了{金额}踩雷换来的经验"
+      ],
+      "contentStructure": "问题引入→产品介绍→成分分析→使用感受→适用人群→注意事项",
+      "closingTips": "以互动问题结尾，如「姐妹们有同款吗？」「你们还想看什么测评？」",
+      "visualSuggestions": ["产品实拍图", "使用前后对比", "成分表特写", "质地展示"]
+    },
+    "exampleTitles": [
+      "油皮亲妈！这款水乳真的绝了",
+      "敏感肌救星！修复屏障我只认这一瓶",
+      "早C晚A入门指南｜新手必看",
+      "100元以内最值得买的5款精华",
+      "成分党深扒｜这款网红面霜值不值"
+    ],
+    "exampleParagraphs": [
+      {
+        "text": "姐妹们！！！今天必须给你们安利这款水乳组合\n\n用了一个月，T区出油明显减少，毛孔也细腻了很多",
+        "why": "开头用感叹号制造情绪，直接给出使用效果和时间周期，增加可信度"
+      },
+      {
+        "text": "成分党来分析一下：\n- 烟酰胺 3%：控油+提亮\n- 水杨酸 0.5%：疏通毛孔\n- 透明质酸：保湿不油腻",
+        "why": "用列表形式展示成分，每个成分配功效说明，专业但不晦涩"
+      }
+    ],
+    "taboos": [
+      "不要用「首先、其次、最后」这种AI感很强的结构",
+      "不要说「这款产品非常好用」这种空洞的评价",
+      "不要忽略适用肤质和可能的不适反应",
+      "不要过度使用「绝绝子」「yyds」等过时网络用语"
+    ],
+    "subTopics": [
+      {"id": "oily-skin", "name": "油皮控油", "keywords": ["控油", "T区", "毛孔", "油皮"], "specificTips": "强调清爽质地和控油持久度，提及具体出油部位", "seasonality": "summer"},
+      {"id": "dry-skin", "name": "干皮保湿", "keywords": ["保湿", "补水", "屏障", "干皮"], "specificTips": "强调滋润度和保湿持久性，提及起皮脱屑等具体问题", "seasonality": "winter"},
+      {"id": "sensitive", "name": "敏感肌修护", "keywords": ["敏感", "泛红", "舒缓", "修复"], "specificTips": "强调温和无刺激，提及具体敏感症状和修复过程", "seasonality": "spring_autumn"},
+      {"id": "anti-aging", "name": "抗老抗皱", "keywords": ["抗老", "细纹", "紧致", "抗皱"], "specificTips": "强调长期使用效果，提及具体部位如法令纹、眼周", "seasonality": "all"},
+      {"id": "whitening", "name": "美白淡斑", "keywords": ["美白", "淡斑", "提亮", "暗沉"], "specificTips": "强调安全美白，提及防晒配合，避免夸大效果", "seasonality": "all"},
+      {"id": "acne", "name": "祛痘祛印", "keywords": ["祛痘", "痘印", "闭口", "粉刺"], "specificTips": "区分不同类型痘痘，强调不要挤痘，提及消炎成分", "seasonality": "all"},
+      {"id": "eye-care", "name": "眼部护理", "keywords": ["眼霜", "黑眼圈", "眼纹", "眼袋"], "specificTips": "强调眼周皮肤特殊性，提及按摩手法", "seasonality": "all"},
+      {"id": "sunscreen", "name": "防晒攻略", "keywords": ["防晒", "SPF", "晒后", "紫外线"], "specificTips": "强调防晒重要性，提及补涂频率和用量", "seasonality": "summer"},
+      {"id": "makeup", "name": "彩妆教程", "keywords": ["妆容", "眼妆", "唇妆", "腮红"], "specificTips": "步骤要清晰，配合具体产品推荐", "seasonality": "all"},
+      {"id": "base-makeup", "name": "底妆技巧", "keywords": ["粉底", "遮瑕", "定妆", "持妆"], "specificTips": "强调肤质匹配，提及持妆时长和脱妆情况", "seasonality": "all"},
+      {"id": "affordable", "name": "平价好物", "keywords": ["平价", "学生党", "性价比", "白菜价"], "specificTips": "明确价格区间，与大牌对比性价比", "seasonality": "all"},
+      {"id": "ingredients", "name": "成分解析", "keywords": ["成分", "烟酰胺", "A醇", "玻尿酸"], "specificTips": "用通俗语言解释专业成分，说明浓度和搭配禁忌", "seasonality": "all"},
+      {"id": "medical-beauty", "name": "医美入门", "keywords": ["医美", "光子", "水光", "热玛吉"], "specificTips": "强调正规机构，说明恢复期和注意事项", "seasonality": "all"},
+      {"id": "routine", "name": "护肤顺序", "keywords": ["护肤步骤", "早C晚A", "护肤流程"], "specificTips": "强调顺序重要性，说明为什么这样搭配", "seasonality": "all"},
+      {"id": "seasonal", "name": "换季护肤", "keywords": ["换季", "过敏", "维稳", "屏障"], "specificTips": "强调换季皮肤变化，提供过渡期护肤建议", "seasonality": "spring_autumn"}
+    ],
+    "seasonalTopics": {
+      "spring": ["换季护肤", "敏感肌修护", "防晒入门"],
+      "summer": ["油皮控油", "防晒攻略", "清爽底妆"],
+      "autumn": ["换季护肤", "保湿修复", "唇部护理"],
+      "winter": ["干皮保湿", "身体乳推荐", "手部护理"]
+    }
+  },
+  {
+    "id": "fashion",
+    "name": "穿搭时尚",
+    "icon": "👗",
+    "nickname": "搭配师",
+    "readerPsychology": {
+      "coreNeeds": ["找到适合自己身材的穿搭", "提升穿衣品味", "平价也能穿出高级感", "解决具体穿搭难题"],
+      "likesToSee": ["完整穿搭公式", "单品链接和价格", "不同身材的参考", "实穿性强的日常搭配"],
+      "dislikesToSee": ["只适合模特身材", "不说身高体重", "找不到同款", "过于夸张不日常"],
+      "triggerPoints": ["显瘦", "显高", "小个子友好", "微胖可穿", "平价", "质感"],
+      "trustSignals": ["真人试穿", "标注身高体重", "多角度展示", "说明面料手感"]
+    },
+    "writingStrategy": {
+      "titleFormulas": [
+        "{身材特点}穿搭｜{身高}也能穿出{效果}",
+        "{场景}穿什么？这{数量}套搭配闭眼抄",
+        "{风格}穿搭公式｜{单品}+{单品}={效果}",
+        "{价格}以内｜{数量}套{风格}穿搭分享",
+        "别再乱买了！{身材}最该入的{数量}件单品"
+      ],
+      "openingStyles": [
+        "身高{数字}的我，终于找到了{效果}穿搭公式！",
+        "{身材特点}姐妹看过来！这套搭配真的绝",
+        "今日穿搭分享｜{风格}风一整套look",
+        "被问了无数次的{单品}，今天统一回复"
+      ],
+      "contentStructure": "整体效果展示→单品拆解→搭配技巧→适合人群→购买信息",
+      "closingTips": "询问读者喜欢哪套，或者想看什么风格的穿搭",
+      "visualSuggestions": ["全身穿搭图", "单品平铺图", "细节特写", "多角度展示"]
+    },
+    "exampleTitles": [
+      "小个子穿搭｜155cm也能穿出大长腿",
+      "微胖女生穿搭｜这样穿显瘦10斤",
+      "通勤穿搭｜上班也要美美的",
+      "300元搞定一周穿搭｜学生党必看",
+      "梨形身材穿搭｜遮胯显腿长"
+    ],
+    "exampleParagraphs": [
+      {
+        "text": "身高155的我，终于找到了显高穿搭公式！\n\n今日穿搭：\n上衣：短款针织开衫（提高腰线是关键）\n下装：高腰阔腿裤（遮肉显瘦）\n鞋子：厚底乐福鞋（隐形增高5cm）",
+        "why": "开头点明身高建立共鸣，用清单形式列出单品并说明每件的作用"
+      },
+      {
+        "text": "小个子穿搭技巧：\n1. 上短下长，黄金比例\n2. 同色系穿搭，视觉延伸\n3. 高腰是永远的神\n4. 避免横条纹和大印花",
+        "why": "总结实用技巧，用数字列表便于记忆，每条都简洁有力"
+      }
+    ],
+    "taboos": [
+      "不要只放美图不说身高体重",
+      "不要推荐过于昂贵或难买到的单品",
+      "不要忽略不同身材的适用性",
+      "不要用过于专业的时尚术语"
+    ],
+    "subTopics": [
+      {"id": "petite", "name": "小个子穿搭", "keywords": ["155", "小个子", "显高", "比例"], "specificTips": "强调提高腰线、纵向延伸、避免压身高的单品", "seasonality": "all"},
+      {"id": "plus-size", "name": "微胖穿搭", "keywords": ["微胖", "遮肉", "显瘦", "梨形"], "specificTips": "强调遮肉显瘦技巧，避免紧身和膨胀色", "seasonality": "all"},
+      {"id": "work", "name": "通勤穿搭", "keywords": ["通勤", "上班", "职场", "OL"], "specificTips": "强调得体大方，兼顾舒适和专业感", "seasonality": "all"},
+      {"id": "date", "name": "约会穿搭", "keywords": ["约会", "甜美", "氛围感", "女团"], "specificTips": "强调精致感和女性魅力，适度性感", "seasonality": "all"},
+      {"id": "student", "name": "学生穿搭", "keywords": ["学生党", "校园", "平价", "日常"], "specificTips": "强调平价实穿，符合校园场景", "seasonality": "all"},
+      {"id": "spring-fashion", "name": "春季穿搭", "keywords": ["春装", "外套", "叠穿", "开衫"], "specificTips": "强调早晚温差穿搭，叠穿技巧", "seasonality": "spring"},
+      {"id": "summer-fashion", "name": "夏季穿搭", "keywords": ["夏装", "清凉", "防晒衫", "短裤"], "specificTips": "强调清凉透气，防晒与时尚兼顾", "seasonality": "summer"},
+      {"id": "autumn-fashion", "name": "秋季穿搭", "keywords": ["秋装", "针织", "风衣", "卫衣"], "specificTips": "强调层次感和秋季氛围", "seasonality": "autumn"},
+      {"id": "winter-fashion", "name": "冬季穿搭", "keywords": ["冬装", "羽绒服", "大衣", "保暖"], "specificTips": "强调保暖不臃肿，内搭技巧", "seasonality": "winter"},
+      {"id": "korean", "name": "韩系穿搭", "keywords": ["韩系", "INS风", "简约", "气质"], "specificTips": "强调简约高级感，基础款搭配", "seasonality": "all"},
+      {"id": "japanese", "name": "日系穿搭", "keywords": ["日系", "森系", "文艺", "软妹"], "specificTips": "强调柔和配色和层次感", "seasonality": "all"},
+      {"id": "accessories", "name": "配饰搭配", "keywords": ["包包", "首饰", "帽子", "腰带"], "specificTips": "强调配饰提升整体造型的作用", "seasonality": "all"}
+    ],
+    "seasonalTopics": {
+      "spring": ["春季穿搭", "开衫搭配", "早春叠穿"],
+      "summer": ["夏季穿搭", "防晒穿搭", "清凉显瘦"],
+      "autumn": ["秋季穿搭", "风衣搭配", "针织开衫"],
+      "winter": ["冬季穿搭", "羽绒服搭配", "保暖显瘦"]
+    }
+  },
+  {
+    "id": "food",
+    "name": "美食探店",
+    "icon": "🍜",
+    "nickname": "吃货",
+    "readerPsychology": {
+      "coreNeeds": ["找到好吃不踩雷的店", "了解真实的用餐体验", "知道人均消费", "获取实用的点餐建议"],
+      "likesToSee": ["真实的菜品图片", "详细的人均价格", "具体的推荐菜品", "环境和服务评价"],
+      "dislikesToSee": ["明显的广告", "只说好不说缺点", "不说价格", "图片过度美化"],
+      "triggerPoints": ["人均XX", "必点", "回头客", "排队也要吃", "本地人推荐"],
+      "trustSignals": ["多次去过", "不同菜品都尝过", "说明就餐时间", "提及服务态度"]
+    },
+    "writingStrategy": {
+      "titleFormulas": [
+        "人均{价格}吃到撑！这家{菜系}太绝了",
+        "{城市}探店｜本地人私藏的{类型}店",
+        "排队{时间}也要吃！这家{菜品}真的绝",
+        "{场景}聚餐去哪？这{数量}家闭眼冲",
+        "避雷！{城市}这家网红店千万别去"
+      ],
+      "openingStyles": [
+        "终于找到一家好吃不贵的{菜系}馆！！",
+        "作为一个{城市}土著，这家店我吃了{数量}年",
+        "被朋友安利的这家店，没想到这么惊艳",
+        "网红店实测！到底值不值得排队"
+      ],
+      "contentStructure": "店铺信息→环境介绍→必点菜品→避雷建议→人均消费→总结推荐",
+      "closingTips": "询问读者还想看什么类型的探店，或者有没有其他推荐",
+      "visualSuggestions": ["菜品特写", "店铺环境", "菜单价格", "排队情况"]
+    },
+    "exampleTitles": [
+      "人均50吃到撑！这家川菜太绝了",
+      "北京探店｜本地人私藏的胡同小馆",
+      "排队2小时也要吃！这家火锅真的绝",
+      "朋友聚餐去哪？这5家闭眼冲",
+      "避雷！这家网红餐厅千万别去"
+    ],
+    "exampleParagraphs": [
+      {
+        "text": "终于找到一家好吃不贵的川菜馆！！\n\n📍地址：xx路xx号（地铁x号线x站）\n💰人均：50元\n⏰营业时间：11:00-22:00",
+        "why": "开头表达惊喜情绪，紧接着给出最关键的信息：地址、人均、时间"
+      },
+      {
+        "text": "必点菜品：\n1. 水煮牛肉 - 麻辣鲜香，牛肉超嫩\n2. 酸菜鱼 - 酸爽开胃，鱼片很厚\n3. 干煸四季豆 - 下饭神器\n\n避雷：\n- 回锅肉偏咸，不太推荐",
+        "why": "用数字列表推荐必点，每道菜配简短点评，同时诚实说明避雷项"
+      }
+    ],
+    "taboos": [
+      "不要隐瞒人均消费",
+      "不要只说优点不说缺点",
+      "不要用过度美化的滤镜图片",
+      "不要推荐明显是广告的内容"
+    ],
+    "subTopics": [
+      {"id": "restaurant", "name": "探店测评", "keywords": ["探店", "人均", "必点", "测评"], "specificTips": "详细说明地址、人均、推荐菜品和避雷项", "seasonality": "all"},
+      {"id": "home-cooking", "name": "家常菜谱", "keywords": ["家常", "下饭", "简单", "快手"], "specificTips": "步骤要详细，食材要常见易买", "seasonality": "all"},
+      {"id": "diet-meal", "name": "减脂餐", "keywords": ["减脂", "低卡", "健康", "轻食"], "specificTips": "标注热量，强调饱腹感和营养均衡", "seasonality": "all"},
+      {"id": "baking", "name": "烘焙甜点", "keywords": ["烘焙", "蛋糕", "甜品", "饼干"], "specificTips": "配方要精确，说明失败原因和技巧", "seasonality": "all"},
+      {"id": "solo-meal", "name": "一人食", "keywords": ["一人食", "独居", "单身", "快手"], "specificTips": "分量适合一人，强调简单快捷", "seasonality": "all"},
+      {"id": "lazy-recipe", "name": "懒人食谱", "keywords": ["懒人", "快手", "10分钟", "简单"], "specificTips": "步骤越少越好，强调省时省力", "seasonality": "all"},
+      {"id": "air-fryer", "name": "空气炸锅", "keywords": ["空气炸锅", "免油", "酥脆", "炸"], "specificTips": "标注温度和时间，说明不同食材的差异", "seasonality": "all"},
+      {"id": "hotpot", "name": "火锅烧烤", "keywords": ["火锅", "烧烤", "聚餐", "撸串"], "specificTips": "推荐锅底和必点菜品，说明人均和适合人数", "seasonality": "winter"},
+      {"id": "drinks", "name": "奶茶饮品", "keywords": ["奶茶", "咖啡", "饮品", "自制"], "specificTips": "推荐具体口味和甜度，或分享自制配方", "seasonality": "summer"},
+      {"id": "local-food", "name": "地方美食", "keywords": ["川菜", "粤菜", "地方", "特色"], "specificTips": "介绍地方特色，推荐正宗店铺", "seasonality": "all"},
+      {"id": "breakfast", "name": "早餐食谱", "keywords": ["早餐", "营养", "快手", "元气"], "specificTips": "强调营养搭配和准备时间", "seasonality": "all"},
+      {"id": "midnight-snack", "name": "宵夜推荐", "keywords": ["宵夜", "深夜", "解馋", "夜宵"], "specificTips": "推荐深夜营业的店或简单自制", "seasonality": "all"}
+    ],
+    "seasonalTopics": {
+      "spring": ["春季时令菜", "野菜尝鲜", "春游便当"],
+      "summer": ["消暑饮品", "凉菜推荐", "冰品测评"],
+      "autumn": ["秋季进补", "大闸蟹攻略", "栗子美食"],
+      "winter": ["火锅推荐", "暖身汤品", "冬季进补"]
+    }
+  },
+  {
+    "id": "travel",
+    "name": "旅行攻略",
+    "icon": "✈️",
+    "nickname": "旅行家",
+    "readerPsychology": {
+      "coreNeeds": ["规划高性价比行程", "避免踩雷", "发现小众目的地", "获取实用攻略"],
+      "likesToSee": ["详细费用明细", "真实体验分享", "具体行程安排", "实用避坑建议"],
+      "dislikesToSee": ["只有美图没有攻略", "不说具体花费", "过于商业化推荐", "信息过时"],
+      "triggerPoints": ["人均XX", "省钱攻略", "小众", "本地人推荐", "避坑"],
+      "trustSignals": ["亲身经历", "详细费用清单", "多次去过", "提供替代方案"]
+    },
+    "writingStrategy": {
+      "titleFormulas": [
+        "{目的地}{天数}天{夜数}晚｜人均{价格}超详细攻略",
+        "{目的地}旅行｜本地人私藏的{数量}个小众景点",
+        "去{目的地}前必看！这{数量}个坑千万别踩",
+        "{人群}去{目的地}怎么玩？保姆级攻略来了",
+        "{季节}去{目的地}｜{特色}最佳时间"
+      ],
+      "openingStyles": [
+        "刚从{目的地}回来！趁着记忆还热乎赶紧整理攻略",
+        "去了{数量}次{目的地}，这份攻略绝对是精华",
+        "作为{目的地}本地人，这些地方游客根本不知道",
+        "原本预算{金额}，最后只花了{金额}！省钱攻略来了"
+      ],
+      "contentStructure": "行程概览→每日安排→费用明细→交通指南→住宿推荐→美食推荐→避坑提醒",
+      "closingTips": "询问读者想去哪里，或者有什么问题可以评论区问",
+      "visualSuggestions": ["景点实拍", "美食图片", "行程表格", "费用清单"]
+    },
+    "exampleTitles": [
+      "三亚5天4晚｜人均2000超详细攻略",
+      "成都旅行｜本地人私藏的10个小众景点",
+      "去云南前必看！这5个坑千万别踩",
+      "情侣去厦门怎么玩？保姆级攻略来了",
+      "冬季去哈尔滨｜看雪最佳时间"
+    ],
+    "exampleParagraphs": [
+      {
+        "text": "刚从三亚回来！趁着记忆还热乎赶紧整理攻略\n\n【行程安排】\nDay1：到达+入住酒店\nDay2：蜈支洲岛一日游\nDay3：亚龙湾热带天堂森林公园\nDay4：南山寺+天涯海角\nDay5：免税店+返程",
+        "why": "开头说明时效性，用清晰的日程表展示行程，便于读者参考"
+      },
+      {
+        "text": "【费用明细】\n机票：往返800/人\n酒店：4晚共600\n门票：约400\n餐饮：约300\n交通：约100\n\n总计：人均2200左右",
+        "why": "详细列出各项费用，让读者对预算有清晰认知"
+      }
+    ],
+    "taboos": [
+      "不要只放美图不给攻略",
+      "不要隐瞒真实花费",
+      "不要推荐过于商业化的景点",
+      "不要用过时的信息"
+    ],
+    "subTopics": [
+      {"id": "domestic-hot", "name": "国内热门", "keywords": ["三亚", "成都", "重庆", "西安"], "specificTips": "提供详细交通和住宿建议，推荐本地美食", "seasonality": "all"},
+      {"id": "hidden-gems", "name": "小众目的地", "keywords": ["小众", "冷门", "人少", "私藏"], "specificTips": "强调独特性和避开人流的优势", "seasonality": "all"},
+      {"id": "overseas", "name": "出境游", "keywords": ["日本", "泰国", "韩国", "新加坡"], "specificTips": "提供签证、换汇、通讯等实用信息", "seasonality": "all"},
+      {"id": "budget", "name": "穷游攻略", "keywords": ["穷游", "省钱", "人均", "低预算"], "specificTips": "详细列出省钱技巧和替代方案", "seasonality": "all"},
+      {"id": "family", "name": "亲子游", "keywords": ["亲子", "带娃", "遛娃", "儿童"], "specificTips": "考虑儿童需求，推荐适合家庭的活动", "seasonality": "holiday"},
+      {"id": "couple", "name": "情侣游", "keywords": ["情侣", "浪漫", "约会", "蜜月"], "specificTips": "推荐浪漫景点和体验", "seasonality": "all"},
+      {"id": "weekend", "name": "周末游", "keywords": ["周末", "周边", "2天1夜", "短途"], "specificTips": "强调便捷性和时间效率", "seasonality": "all"},
+      {"id": "photo-spots", "name": "拍照打卡", "keywords": ["拍照", "出片", "打卡", "网红"], "specificTips": "提供最佳拍照时间和角度建议", "seasonality": "all"},
+      {"id": "accommodation", "name": "酒店民宿", "keywords": ["酒店", "民宿", "住宿", "推荐"], "specificTips": "说明价位、位置优势和预订渠道", "seasonality": "all"},
+      {"id": "transport", "name": "交通攻略", "keywords": ["机票", "高铁", "租车", "交通"], "specificTips": "提供省钱订票技巧和当地交通指南", "seasonality": "all"},
+      {"id": "food-map", "name": "美食地图", "keywords": ["当地美食", "必吃", "特产", "小吃"], "specificTips": "推荐本地人常去的店，避开游客陷阱", "seasonality": "all"},
+      {"id": "avoid-traps", "name": "避坑指南", "keywords": ["避坑", "踩雷", "注意", "别去"], "specificTips": "诚实分享负面体验，帮助读者避雷", "seasonality": "all"}
+    ],
+    "seasonalTopics": {
+      "spring": ["赏花攻略", "清明出游", "春季目的地"],
+      "summer": ["避暑胜地", "海岛游", "暑假亲子"],
+      "autumn": ["赏秋攻略", "国庆出游", "红叶目的地"],
+      "winter": ["滑雪攻略", "温泉推荐", "春节旅行"]
+    }
+  },
+  {
+    "id": "home",
+    "name": "家居生活",
+    "icon": "🏠",
+    "nickname": "生活家",
+    "readerPsychology": {
+      "coreNeeds": ["提升居住品质", "解决收纳难题", "低成本改造", "打造理想家"],
+      "likesToSee": ["改造前后对比", "详细步骤教程", "具体产品推荐", "真实花费"],
+      "dislikesToSee": ["只有效果图没有过程", "产品太贵买不起", "不实用的设计", "过度装修"],
+      "triggerPoints": ["改造", "收纳", "提升幸福感", "租房党", "小户型"],
+      "trustSignals": ["真实居住体验", "使用一段时间后的反馈", "详细花费清单", "优缺点都说"]
+    },
+    "writingStrategy": {
+      "titleFormulas": [
+        "{场景}改造｜{金额}打造{风格}小窝",
+        "{问题}怎么办？这{数量}个{方案}太实用了",
+        "{人群}必看！{数量}个提升幸福感的家居好物",
+        "住了{时间}才敢说！这{数量}个{品类}真的值",
+        "别再乱买了！{空间}真正需要的就这几样"
+      ],
+      "openingStyles": [
+        "{人群}也要有生活品质！",
+        "住了{时间}，这些好物我真的离不开了",
+        "花了{金额}踩雷换来的经验，姐妹们别再走弯路",
+        "改造前vs改造后，房东看了都想涨房租"
+      ],
+      "contentStructure": "问题/需求→解决方案→具体产品→使用体验→花费清单→注意事项",
+      "closingTips": "询问读者的居住痛点，或者分享自己的改造经验",
+      "visualSuggestions": ["改造前后对比", "产品实拍", "收纳效果", "氛围感照片"]
+    },
+    "exampleTitles": [
+      "出租屋改造｜500块打造ins风小窝",
+      "衣柜太乱怎么办？这5个收纳神器太实用了",
+      "租房党必看！10个提升幸福感的家居好物",
+      "住了3年才敢说！这5个厨房好物真的值",
+      "别再乱买了！卧室真正需要的就这几样"
+    ],
+    "exampleParagraphs": [
+      {
+        "text": "租房党也要有生活品质！\n\n改造清单：\n1. 仙女灯串 - 19.9\n2. 桌布+餐垫 - 35\n3. 绿植摆件 - 50\n4. 收纳盒套装 - 89\n5. 窗帘 - 120\n\n总花费：313.9元",
+        "why": "开头点明目标人群，用清单形式列出产品和价格，一目了然"
+      },
+      {
+        "text": "使用感受：\n✅ 灯串氛围感拉满，晚上超温馨\n✅ 收纳盒让桌面整洁了很多\n❌ 窗帘有点薄，遮光效果一般\n\n建议：预算够的话窗帘可以买厚一点的",
+        "why": "用emoji区分优缺点，诚实分享不足之处，给出改进建议"
+      }
+    ],
+    "taboos": [
+      "不要只放效果图不说怎么做到的",
+      "不要推荐过于昂贵的产品",
+      "不要忽略租房党的实际限制",
+      "不要过度美化，要说真实使用感受"
+    ],
+    "subTopics": [
+      {"id": "rental", "name": "租房改造", "keywords": ["租房", "改造", "低成本", "出租屋"], "specificTips": "强调可拆卸、不破坏原有装修", "seasonality": "all"},
+      {"id": "storage", "name": "收纳整理", "keywords": ["收纳", "整理", "断舍离", "归纳"], "specificTips": "提供具体的收纳方法和产品推荐", "seasonality": "all"},
+      {"id": "home-goods", "name": "好物推荐", "keywords": ["好物", "神器", "幸福感", "推荐"], "specificTips": "说明使用场景和真实体验", "seasonality": "all"},
+      {"id": "decoration", "name": "装修避坑", "keywords": ["装修", "避坑", "翻车", "后悔"], "specificTips": "分享真实装修经验和教训", "seasonality": "all"},
+      {"id": "ambiance", "name": "氛围感布置", "keywords": ["氛围感", "INS风", "温馨", "治愈"], "specificTips": "强调灯光、软装搭配技巧", "seasonality": "all"},
+      {"id": "cleaning", "name": "清洁技巧", "keywords": ["清洁", "去污", "家务", "打扫"], "specificTips": "提供具体的清洁方法和产品", "seasonality": "all"},
+      {"id": "kitchen", "name": "厨房好物", "keywords": ["厨房", "厨具", "小家电", "做饭"], "specificTips": "强调实用性和使用频率", "seasonality": "all"},
+      {"id": "bedroom", "name": "卧室布置", "keywords": ["卧室", "床品", "睡眠", "舒适"], "specificTips": "强调睡眠质量和舒适度", "seasonality": "all"},
+      {"id": "plants", "name": "绿植养护", "keywords": ["绿植", "养花", "多肉", "盆栽"], "specificTips": "提供养护技巧，推荐好养的品种", "seasonality": "spring"},
+      {"id": "fragrance", "name": "香薰蜡烛", "keywords": ["香薰", "蜡烛", "香氛", "精油"], "specificTips": "描述香味特点和使用场景", "seasonality": "all"}
+    ],
+    "seasonalTopics": {
+      "spring": ["春季大扫除", "绿植入门", "换季收纳"],
+      "summer": ["夏季清凉布置", "防潮除湿", "驱蚊好物"],
+      "autumn": ["秋季氛围感", "换季整理", "温馨布置"],
+      "winter": ["冬季保暖", "新年布置", "年货收纳"]
+    }
+  },
+  {
+    "id": "fitness",
+    "name": "健身运动",
+    "icon": "💪",
+    "nickname": "健身达人",
+    "readerPsychology": {
+      "coreNeeds": ["科学减脂增肌", "找到适合自己的运动方式", "获取专业指导", "保持运动动力"],
+      "likesToSee": ["真实的身材变化", "详细的动作教程", "科学的训练计划", "饮食搭配建议"],
+      "dislikesToSee": ["不切实际的效果承诺", "危险的动作示范", "只卖课不给干货", "身材焦虑营销"],
+      "triggerPoints": ["亲测有效", "掉秤", "体态改善", "新手友好", "居家可做"],
+      "trustSignals": ["展示真实变化过程", "说明训练周期", "提醒注意事项", "承认个体差异"]
+    },
+    "writingStrategy": {
+      "titleFormulas": [
+        "{运动}一周{效果}｜亲测{结果}",
+        "{人群}健身入门｜{数量}个动作练出{效果}",
+        "{部位}训练｜每天{时间}分钟{效果}",
+        "别再{错误做法}了！{正确方法}才有效",
+        "{时间}天{计划}｜从{起点}到{终点}"
+      ],
+      "openingStyles": [
+        "坚持{运动}{时间}的真实记录！",
+        "作为一个{身材特点}，我太懂{痛点}了",
+        "这套动作我练了{时间}，效果真的绝",
+        "新手必看！我走过的弯路你们别再走了"
+      ],
+      "contentStructure": "目标说明→训练计划→动作详解→注意事项→饮食建议→效果展示",
+      "closingTips": "鼓励读者坚持，询问训练问题或想看什么部位的教程",
+      "visualSuggestions": ["动作示范", "前后对比", "训练计划表", "饮食搭配图"]
+    },
+    "exampleTitles": [
+      "帕梅拉一周暴汗计划｜亲测掉秤5斤",
+      "新手健身入门｜8个动作练出马甲线",
+      "臀腿训练｜每天15分钟蜜桃臀",
+      "别再节食了！吃饱才能瘦",
+      "30天体态矫正｜从驼背到天鹅颈"
+    ],
+    "exampleParagraphs": [
+      {
+        "text": "坚持帕梅拉一周的真实记录！\n\n【每日安排】\n周一：20min全身燃脂\n周二：15min腹部训练\n周三：20min手臂塑形\n周四：休息\n周五：25min臀腿训练\n周六：20min全身拉伸\n周日：30min有氧舞蹈",
+        "why": "开头说明时间周期，用清晰的日程表展示训练计划，包含休息日更科学"
+      },
+      {
+        "text": "【饮食搭配】\n早餐：鸡蛋+全麦面包+牛奶\n午餐：糙米饭+鸡胸肉+蔬菜\n晚餐：沙拉/代餐\n\n一周体重变化：56kg → 53.5kg\n\n注意：刚开始会很累，但坚持下来真的有效！",
+        "why": "配合饮食建议更完整，展示真实数据，最后给予鼓励"
+      }
+    ],
+    "taboos": [
+      "不要承诺不切实际的效果",
+      "不要示范危险动作",
+      "不要制造身材焦虑",
+      "不要忽略热身和拉伸的重要性"
+    ],
+    "subTopics": [
+      {"id": "fat-loss", "name": "减脂瘦身", "keywords": ["减脂", "减肥", "掉秤", "瘦身"], "specificTips": "强调热量缺口原理，配合饮食建议", "seasonality": "all"},
+      {"id": "muscle-gain", "name": "增肌塑形", "keywords": ["增肌", "塑形", "线条", "肌肉"], "specificTips": "强调蛋白质摄入和渐进超负荷", "seasonality": "all"},
+      {"id": "home-workout", "name": "居家健身", "keywords": ["居家", "帕梅拉", "无器械", "徒手"], "specificTips": "强调不需要器械，在家就能做", "seasonality": "all"},
+      {"id": "yoga", "name": "瑜伽拉伸", "keywords": ["瑜伽", "拉伸", "柔韧", "放松"], "specificTips": "强调呼吸配合和循序渐进", "seasonality": "all"},
+      {"id": "running", "name": "跑步有氧", "keywords": ["跑步", "有氧", "心肺", "慢跑"], "specificTips": "提供配速建议和跑步装备推荐", "seasonality": "all"},
+      {"id": "beginner", "name": "新手入门", "keywords": ["新手", "入门", "零基础", "小白"], "specificTips": "动作要简单，强调正确姿势", "seasonality": "all"},
+      {"id": "diet", "name": "饮食搭配", "keywords": ["饮食", "蛋白质", "碳水", "热量"], "specificTips": "提供具体食谱和热量参考", "seasonality": "all"},
+      {"id": "targeted", "name": "局部训练", "keywords": ["腹肌", "臀腿", "手臂", "背部"], "specificTips": "针对具体部位提供训练动作", "seasonality": "all"},
+      {"id": "posture", "name": "体态矫正", "keywords": ["体态", "驼背", "圆肩", "骨盆"], "specificTips": "强调日常习惯改善和长期坚持", "seasonality": "all"},
+      {"id": "check-in", "name": "健身打卡", "keywords": ["打卡", "记录", "对比", "坚持"], "specificTips": "分享真实变化过程，鼓励坚持", "seasonality": "all"}
+    ],
+    "seasonalTopics": {
+      "spring": ["春季减脂", "露肉季准备", "户外运动"],
+      "summer": ["夏日燃脂", "游泳健身", "清晨运动"],
+      "autumn": ["秋季增肌", "马拉松备战", "室内训练"],
+      "winter": ["冬季保持", "室内有氧", "春节不长胖"]
+    }
+  },
+  {
+    "id": "tech",
+    "name": "数码科技",
+    "icon": "📱",
+    "nickname": "数码控",
+    "readerPsychology": {
+      "coreNeeds": ["选购合适的数码产品", "了解真实使用体验", "避免踩雷", "提升效率"],
+      "likesToSee": ["真实使用体验", "参数对比分析", "优缺点客观评价", "购买建议"],
+      "dislikesToSee": ["明显的广告软文", "只说优点不说缺点", "参数堆砌没有体验", "过时的信息"],
+      "triggerPoints": ["真实测评", "避坑", "性价比", "实际体验", "对比"],
+      "trustSignals": ["长期使用反馈", "多款对比", "说明使用场景", "承认产品不足"]
+    },
+    "writingStrategy": {
+      "titleFormulas": [
+        "{产品}使用{时间}真实体验｜值不值得买",
+        "{品类}怎么选？{数量}款热门{对比}",
+        "别再买错了！{人群}真正需要的{品类}",
+        "{价位}最值得买的{数量}款{品类}",
+        "{产品}vs{产品}｜到底选哪个"
+      ],
+      "openingStyles": [
+        "作为一个{身份}，说说{产品}的真实使用感受",
+        "用了{时间}，终于可以客观评价这款{产品}了",
+        "被问了无数次{问题}，今天统一回复",
+        "花了{金额}踩雷换来的经验，希望对你有帮助"
+      ],
+      "contentStructure": "产品介绍→核心参数→实际体验→优缺点分析→适合人群→购买建议",
+      "closingTips": "询问读者的使用场景，或者想了解什么产品",
+      "visualSuggestions": ["产品实拍", "参数对比表", "使用场景图", "细节特写"]
+    },
+    "exampleTitles": [
+      "iPhone 16 Pro使用一个月真实体验",
+      "笔记本怎么选？5款热门轻薄本对比",
+      "别再买错了！学生党真正需要的平板",
+      "2000元最值得买的3款TWS耳机",
+      "iPad vs 安卓平板｜到底选哪个"
+    ],
+    "exampleParagraphs": [
+      {
+        "text": "作为一个安卓转iOS的用户，说说真实感受\n\n【优点】\n1. A18芯片确实流畅\n2. 拍照直出效果好\n3. 生态体验无敌\n4. 钛金属边框手感好\n\n【缺点】\n1. 信号还是老问题\n2. 充电速度感人\n3. 价格确实贵",
+        "why": "开头说明身份背景，用列表形式分别列出优缺点，客观公正"
+      },
+      {
+        "text": "【购买建议】\n如果你是：\n- 苹果生态用户 → 建议升级\n- 安卓用户 → 看个人需求\n- 上一代用户 → 没必要换\n\n总结：值得买，但不是必须买",
+        "why": "针对不同人群给出具体建议，结论简洁明了"
+      }
+    ],
+    "taboos": [
+      "不要只堆参数不说体验",
+      "不要隐瞒产品缺点",
+      "不要用过时的信息",
+      "不要做明显的广告软文"
+    ],
+    "subTopics": [
+      {"id": "phone", "name": "手机测评", "keywords": ["iPhone", "安卓", "手机", "测评"], "specificTips": "关注日常使用体验，不只是跑分", "seasonality": "all"},
+      {"id": "laptop", "name": "电脑推荐", "keywords": ["笔记本", "台式", "电脑", "配置"], "specificTips": "根据使用场景推荐，说明适合人群", "seasonality": "all"},
+      {"id": "tablet", "name": "平板选购", "keywords": ["iPad", "平板", "学习", "娱乐"], "specificTips": "区分学习和娱乐需求", "seasonality": "back_to_school"},
+      {"id": "earphone", "name": "耳机音箱", "keywords": ["耳机", "音箱", "降噪", "音质"], "specificTips": "描述音质特点和佩戴舒适度", "seasonality": "all"},
+      {"id": "camera", "name": "相机摄影", "keywords": ["相机", "摄影", "拍照", "镜头"], "specificTips": "提供样片和拍摄技巧", "seasonality": "all"},
+      {"id": "apps", "name": "App推荐", "keywords": ["App", "软件", "效率", "工具"], "specificTips": "说明具体使用场景和替代方案", "seasonality": "all"},
+      {"id": "accessories", "name": "数码好物", "keywords": ["数码", "配件", "充电", "支架"], "specificTips": "强调实用性和性价比", "seasonality": "all"},
+      {"id": "gaming", "name": "游戏设备", "keywords": ["游戏", "主机", "外设", "电竞"], "specificTips": "关注游戏体验和性能表现", "seasonality": "all"},
+      {"id": "smart-home", "name": "智能家居", "keywords": ["智能", "IoT", "自动化", "米家"], "specificTips": "说明联动场景和使用体验", "seasonality": "all"},
+      {"id": "avoid-traps", "name": "避坑指南", "keywords": ["避坑", "翻车", "不推荐", "踩雷"], "specificTips": "诚实分享负面体验", "seasonality": "all"}
+    ],
+    "seasonalTopics": {
+      "spring": ["春季新品", "开学装备", "摄影器材"],
+      "summer": ["暑期数码", "游戏设备", "便携好物"],
+      "autumn": ["秋季新品", "双十一攻略", "年度盘点"],
+      "winter": ["年货数码", "新年礼物", "CES新品"]
+    }
+  },
+  {
+    "id": "study",
+    "name": "学习成长",
+    "icon": "📚",
+    "nickname": "学霸",
+    "readerPsychology": {
+      "coreNeeds": ["提升学习效率", "获取考试经验", "找到学习方法", "保持学习动力"],
+      "likesToSee": ["真实的上岸经验", "具体的学习方法", "时间管理技巧", "资料推荐"],
+      "dislikesToSee": ["贩卖焦虑", "不切实际的承诺", "只卖课不给干货", "炫耀式分享"],
+      "triggerPoints": ["上岸", "高效", "亲测有效", "保姆级", "干货"],
+      "trustSignals": ["真实成绩展示", "详细时间安排", "失败经验分享", "承认个体差异"]
+    },
+    "writingStrategy": {
+      "titleFormulas": [
+        "{考试}上岸｜{身份}的备考经验分享",
+        "{技能}怎么学？{时间}从{起点}到{终点}",
+        "别再{错误方法}了！{正确方法}才有效",
+        "{人群}必看！{数量}个{领域}学习方法",
+        "{时间}备考{考试}｜保姆级攻略"
+      ],
+      "openingStyles": [
+        "{结果}上岸！分享我的备考经验",
+        "作为一个{身份}，这些方法真的帮到我了",
+        "走了很多弯路，希望你们别再踩坑",
+        "被问了无数次{问题}，今天统一回复"
+      ],
+      "contentStructure": "背景介绍→学习计划→具体方法→资料推荐→心态调整→经验总结",
+      "closingTips": "鼓励读者坚持，询问学习问题或想了解什么内容",
+      "visualSuggestions": ["学习计划表", "笔记展示", "资料清单", "成绩截图"]
+    },
+    "exampleTitles": [
+      "考研上岸｜我的备考时间表分享",
+      "英语怎么学？3个月从四级到六级600+",
+      "别再死记硬背了！这样背单词才有效",
+      "打工人必看！5个下班后学习方法",
+      "6个月备考考研｜保姆级攻略"
+    ],
+    "exampleParagraphs": [
+      {
+        "text": "一战上岸985！分享我的备考经验\n\n【每日时间安排】\n6:30 起床洗漱\n7:00-8:00 背单词\n8:00-12:00 数学\n12:00-14:00 午饭+午休\n14:00-18:00 专业课\n18:00-19:00 晚饭+休息\n19:00-21:00 政治\n21:00-22:30 英语阅读\n22:30-23:00 复盘总结",
+        "why": "开头说明结果建立可信度，用详细的时间表展示学习安排"
+      },
+      {
+        "text": "【心态调整】\n1. 每周休息半天\n2. 适当运动\n3. 不要和别人比进度\n\n加油！你也可以的！",
+        "why": "除了学习方法还关注心态，最后给予鼓励"
+      }
+    ],
+    "taboos": [
+      "不要贩卖焦虑",
+      "不要承诺不切实际的效果",
+      "不要只推销课程不给干货",
+      "不要忽略个体差异"
+    ],
+    "subTopics": [
+      {"id": "postgrad", "name": "考研经验", "keywords": ["考研", "上岸", "备考", "研究生"], "specificTips": "分享真实备考经历和时间安排", "seasonality": "second_half"},
+      {"id": "civil-service", "name": "考公攻略", "keywords": ["考公", "公务员", "行测", "申论"], "specificTips": "提供具体的备考方法和资料推荐", "seasonality": "all"},
+      {"id": "english", "name": "英语学习", "keywords": ["英语", "四六级", "雅思", "托福"], "specificTips": "分享背单词和练习方法", "seasonality": "all"},
+      {"id": "career", "name": "职场技能", "keywords": ["职场", "Excel", "PPT", "沟通"], "specificTips": "提供实用的职场技能教程", "seasonality": "all"},
+      {"id": "time-mgmt", "name": "时间管理", "keywords": ["时间管理", "效率", "自律", "习惯"], "specificTips": "分享具体的时间管理方法和工具", "seasonality": "all"},
+      {"id": "reading", "name": "读书笔记", "keywords": ["读书", "书单", "笔记", "阅读"], "specificTips": "分享读书心得和推荐书单", "seasonality": "all"},
+      {"id": "side-hustle", "name": "副业赚钱", "keywords": ["副业", "兼职", "赚钱", "收入"], "specificTips": "分享真实可行的副业方式", "seasonality": "all"},
+      {"id": "self-improve", "name": "自我提升", "keywords": ["自我提升", "成长", "习惯", "改变"], "specificTips": "分享个人成长经验和方法", "seasonality": "all"},
+      {"id": "certification", "name": "考证攻略", "keywords": ["考证", "CPA", "教资", "证书"], "specificTips": "提供具体考试的备考建议", "seasonality": "all"},
+      {"id": "study-abroad", "name": "留学申请", "keywords": ["留学", "申请", "文书", "offer"], "specificTips": "分享申请经验和时间线", "seasonality": "application_season"},
+      {"id": "interview", "name": "面试技巧", "keywords": ["面试", "简历", "求职", "offer"], "specificTips": "提供面试准备和技巧", "seasonality": "graduation"},
+      {"id": "study-method", "name": "学习方法", "keywords": ["学习方法", "记忆", "专注", "效率"], "specificTips": "分享科学的学习方法", "seasonality": "all"}
+    ],
+    "seasonalTopics": {
+      "spring": ["春招求职", "考研复试", "新学期计划"],
+      "summer": ["暑期学习", "实习经验", "考研备考"],
+      "autumn": ["秋招攻略", "考研冲刺", "考证备考"],
+      "winter": ["年终总结", "新年计划", "寒假学习"]
+    }
+  }
+]

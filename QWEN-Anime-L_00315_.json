@@ -1,0 +1,1228 @@
+{
+  "id": "dd470a10-bbad-41fd-bddb-b8364d7ad3cc",
+  "revision": 0,
+  "last_node_id": 40,
+  "last_link_id": 48,
+  "nodes": [
+    {
+      "id": 12,
+      "type": "VAEDecode",
+      "pos": [
+        20740,
+        8030
+      ],
+      "size": [
+        350,
+        46
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 17,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 10
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 36
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "slot_index": 0,
+          "links": [
+            13,
+            31
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.48",
+        "Node name for S&R": "VAEDecode",
+        "ue_properties": {
+          "version": "7.0.1",
+          "widget_ue_connectable": {}
+        },
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65
+      },
+      "widgets_values": [],
+      "color": "#2a363b",
+      "bgcolor": "#3f5159"
+    },
+    {
+      "id": 27,
+      "type": "SaveImage",
+      "pos": [
+        21110,
+        7090
+      ],
+      "size": [
+        540,
+        980
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 31
+        }
+      ],
+      "outputs": [],
+      "title": "💾 Save Upscaled Image",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.66",
+        "Node name for S&R": "SaveImage",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.4.1"
+        }
+      },
+      "widgets_values": [
+        "QWEN-Anime-H"
+      ],
+      "color": "#223",
+      "bgcolor": "#335"
+    },
+    {
+      "id": 29,
+      "type": "Reroute",
+      "pos": [
+        19150,
+        6970
+      ],
+      "size": [
+        75,
+        26
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "",
+          "type": "*",
+          "link": 39
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "VAE",
+          "links": [
+            33
+          ]
+        }
+      ],
+      "properties": {
+        "showOutputText": false,
+        "horizontal": false,
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.4.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "color": "#322",
+      "bgcolor": "#533"
+    },
+    {
+      "id": 30,
+      "type": "Reroute",
+      "pos": [
+        19590,
+        6970
+      ],
+      "size": [
+        75,
+        26
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "",
+          "type": "*",
+          "link": 33
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "VAE",
+          "links": [
+            34,
+            35
+          ]
+        }
+      ],
+      "properties": {
+        "showOutputText": false,
+        "horizontal": false,
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.4.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "color": "#322",
+      "bgcolor": "#533"
+    },
+    {
+      "id": 31,
+      "type": "Reroute",
+      "pos": [
+        20620,
+        6970
+      ],
+      "size": [
+        75,
+        26
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "",
+          "type": "*",
+          "link": 35
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "VAE",
+          "links": [
+            36
+          ]
+        }
+      ],
+      "properties": {
+        "showOutputText": false,
+        "horizontal": false,
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.4.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "color": "#322",
+      "bgcolor": "#533"
+    },
+    {
+      "id": 13,
+      "type": "Image Comparer (rgthree)",
+      "pos": [
+        21690,
+        7030
+      ],
+      "size": [
+        580,
+        1060
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "dir": 3,
+          "name": "image_a",
+          "type": "IMAGE",
+          "link": 12
+        },
+        {
+          "dir": 3,
+          "name": "image_b",
+          "type": "IMAGE",
+          "link": 13
+        }
+      ],
+      "outputs": [],
+      "title": "🔍 Compare: Base vs Upscaled",
+      "properties": {
+        "cnr_id": "rgthree-comfy",
+        "ver": "b775441a4c5ae2853d4ff6b97a137f7f7d11e597",
+        "comparer_mode": "Slide",
+        "ue_properties": {
+          "version": "7.0.1",
+          "widget_ue_connectable": {}
+        }
+      },
+      "widgets_values": [
+        [
+          {
+            "name": "A",
+            "selected": true,
+            "url": "/api/view?filename=rgthree.compare._temp_xqfym_00001_.png&type=temp&subfolder=&rand=0.2734551891148753"
+          }
+        ]
+      ],
+      "color": "#223",
+      "bgcolor": "#335",
+      "shape": 1
+    },
+    {
+      "id": 2,
+      "type": "ModelSamplingAuraFlow",
+      "pos": [
+        19680,
+        7080
+      ],
+      "size": [
+        220,
+        58
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 42
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            40,
+            41
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.48",
+        "Node name for S&R": "ModelSamplingAuraFlow",
+        "ue_properties": {
+          "version": "7.0.1",
+          "widget_ue_connectable": {}
+        },
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65
+      },
+      "widgets_values": [
+        3
+      ],
+      "color": "#2a363b",
+      "bgcolor": "#3f5159"
+    },
+    {
+      "id": 11,
+      "type": "VAEDecode",
+      "pos": [
+        19678.69921875,
+        7186.7763671875
+      ],
+      "size": [
+        220,
+        46
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 8
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 34
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "slot_index": 0,
+          "links": [
+            12,
+            30
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.48",
+        "Node name for S&R": "VAEDecode",
+        "ue_properties": {
+          "version": "7.0.1",
+          "widget_ue_connectable": {}
+        },
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65
+      },
+      "widgets_values": [],
+      "color": "#2a363b",
+      "bgcolor": "#3f5159"
+    },
+    {
+      "id": 16,
+      "type": "LatentUpscaleBy",
+      "pos": [
+        20740,
+        7090
+      ],
+      "size": [
+        350,
+        82
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 14,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 20
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            17
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.65",
+        "Node name for S&R": "LatentUpscaleBy",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "upscale_method": true,
+            "scale_by": true
+          },
+          "version": "7.0.1"
+        }
+      },
+      "widgets_values": [
+        "nearest-exact",
+        1.5
+      ],
+      "color": "#2a363b",
+      "bgcolor": "#3f5159"
+    },
+    {
+      "id": 26,
+      "type": "SaveImage",
+      "pos": [
+        20250,
+        7030
+      ],
+      "size": [
+        450,
+        780
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 30
+        }
+      ],
+      "outputs": [],
+      "title": "💾 Save Base Image",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.66",
+        "Node name for S&R": "SaveImage",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.4.1"
+        }
+      },
+      "widgets_values": [
+        "QWEN-Anime-L"
+      ],
+      "color": "#223",
+      "bgcolor": "#335"
+    },
+    {
+      "id": 23,
+      "type": "MarkdownNote",
+      "pos": [
+        18030,
+        7030
+      ],
+      "size": [
+        550,
+        560
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "📦 Model Info - Z-Image-Turbo-AIO",
+      "properties": {
+        "ue_properties": {
+          "version": "7.4.1",
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "# 🚀 Z-Image-Turbo-AIO\n\n## Ultra-Fast Photorealistic Generation!\n\n✨ **8-Step Lightning Speed**\n✨ **VAE + Text Encoder integrated**\n✨ **Bilingual text rendering (EN/CN)**\n✨ **No negative prompts needed**\n\n---\n\n## 🔄 Two Versions Available:\n\n### 🟢 Z-Image-BF16-AIO (20 GB)\n**Maximum Precision**\n- Precision: BFloat16\n- Steps: 8-10 (recommended: 8)\n- CFG: 1.0 (keep at 1.0!)\n- Sampler: res_multistep\n- Scheduler: simple\n- VRAM: 8GB works!\n\n### 🟡 Z-Image-FP8-AIO (10 GB)\n**Speed & Efficiency**\n- Precision: FP8\n- Steps: 8-10 (recommended: 8)\n- CFG: 1.0 (keep at 1.0!)\n- Sampler: res_multistep\n- Scheduler: simple\n- VRAM: 8GB perfect!\n\n---\n\n## ⚙️ Critical Settings\n\n### Both Versions:\n- Steps: 8\n- CFG: 1.0 (don't change!)\n- Sampler: res_multistep\n- Scheduler: simple\n- Resolution: 1920×1088 tested\n- NO negative prompts\n\n💡 Natural language prompts work best!\n\n---\n\n## 📥 Downloads\n\n**Main Model (Pick ONE):**\n- 🟢 Z-Image-BF16-AIO (20GB)\n- 🟡 Z-Image-FP8-AIO (10GB)\n\n**NO Lightning LoRAs Needed!**\nAlready optimized for 8-step generation.\n\n---\n\n## 📂 Installation\n\n```\n📂 ComfyUI/models/\n└── 📂 checkpoints/\n    └── z-image-turbo-fp8-aio.safetensors\n```\n\nNo separate VAE/encoder needed!"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 14,
+      "type": "KSampler",
+      "pos": [
+        20740,
+        7220
+      ],
+      "size": [
+        350,
+        758.3076782226562
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 40
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 15
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 48
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 17
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "slot_index": 0,
+          "links": [
+            10
+          ]
+        }
+      ],
+      "title": "✨ Hires Fix Refinement",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.48",
+        "Node name for S&R": "KSampler",
+        "ue_properties": {
+          "version": "7.0.1",
+          "widget_ue_connectable": {}
+        },
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65
+      },
+      "widgets_values": [
+        147055680729376,
+        "fixed",
+        8,
+        1,
+        "res_multistep",
+        "simple",
+        0.55
+      ],
+      "color": "#2a363b",
+      "bgcolor": "#3f5159"
+    },
+    {
+      "id": 28,
+      "type": "Fast Groups Bypasser (rgthree)",
+      "pos": [
+        20720,
+        6920
+      ],
+      "size": [
+        360,
+        58
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "OPT_CONNECTION",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "title": "🔼 Toggle Upscaler ON/OFF",
+      "properties": {
+        "matchColors": "",
+        "matchTitle": "🔼",
+        "showNav": true,
+        "showAllGraphs": true,
+        "sort": "position",
+        "customSortAlphabet": "",
+        "toggleRestriction": "default",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.4.1"
+        }
+      },
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 40,
+      "type": "ConditioningZeroOut",
+      "pos": [
+        19680,
+        7280
+      ],
+      "size": [
+        220,
+        26
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 46
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            47,
+            48
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.75",
+        "Node name for S&R": "ConditioningZeroOut"
+      },
+      "widgets_values": [],
+      "color": "#322",
+      "bgcolor": "#533"
+    },
+    {
+      "id": 35,
+      "type": "MarkdownNote",
+      "pos": [
+        19060,
+        7640
+      ],
+      "size": [
+        290,
+        390
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "📐 Resolution Presets",
+      "properties": {
+        "ue_properties": {
+          "version": "7.4.1",
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "# 📐 Resolution Presets\n\n## 🚀 Fast (Both Versions)\n512×512 • 512×768 • 768×768\n\n## 📱 Standard HD\n832×1216 • 1024×1024 • 1216×832\n\n## 🎬 High Quality\n1024×1536 • 1536×1024\n\n## 🎥 2K Cinematic\n2048×1152 • 1920×1080\n\n---\n\n💡 **Quick Tips:**\n- **Portrait:** 512×768, 832×1216\n- **Landscape:** 1216×832, 2048×1152\n- **Square:** 1024×1024\n\n**Full Model:** Any resolution works\n**Pruned Model:** Best under 1536px"
+      ],
+      "color": "#2a363b",
+      "bgcolor": "#3f5159"
+    },
+    {
+      "id": 32,
+      "type": "MarkdownNote",
+      "pos": [
+        18600,
+        7260
+      ],
+      "size": [
+        510,
+        330
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "📖 Z-Image-Turbo-AIO Workflow",
+      "properties": {
+        "ue_properties": {
+          "version": "7.4.1",
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "# 📖 Z-Image-Turbo Workflow Guide\n\n## 🚀 Ultra-Fast 8-Step Generation!\n\n### 🟢 BF16-AIO (20GB)\n✅ Steps: 8\n✅ CFG: 1.0\n✅ Sampler: res_multistep\n✅ Scheduler: simple\n✅ Max quality: BF16\n\n### 🟡 FP8-AIO (10GB)\n✅ Steps: 8\n✅ CFG: 1.0\n✅ Sampler: res_multistep\n✅ Scheduler: simple\n✅ Smaller file!\n\n---\n\n## 🎨 Quick Steps:\n\n1. **Load Model** - Use 'Load Checkpoint'\n2. **Write Prompt** - Natural language, detailed\n3. **Settings** - 8 steps, CFG 1.0\n4. **Resolution** - 1920×1088 or similar\n5. **Sampler** - res_multistep + simple\n6. **Generate!** - Fast results\n\n---\n\n## 💡 Prompting Tips:\n\n### What Works:\n- Natural language descriptions\n- Detailed (100-500 words)\n- English or Chinese\n- Include lighting, style, mood\n\n### Text Rendering:\n- \"Sign reading 'COFFEE' in neon\"\n- Works in EN & CN!\n\n### Important:\n- NO negative prompts\n- Keep CFG at 1.0\n- Use 8 steps\n- res_multistep sampler\n\nHappy generating! 🚀"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 17,
+      "type": "KSampler",
+      "pos": [
+        19910,
+        7080
+      ],
+      "size": [
+        300,
+        710
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 41
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 22
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 47
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 24
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "slot_index": 0,
+          "links": [
+            8,
+            20
+          ]
+        }
+      ],
+      "title": "🎨 Base Generation",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.48",
+        "Node name for S&R": "KSampler",
+        "ue_properties": {
+          "version": "7.0.1",
+          "widget_ue_connectable": {}
+        },
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65
+      },
+      "widgets_values": [
+        530135379953245,
+        "randomize",
+        9,
+        1,
+        "res_multistep",
+        "simple",
+        1
+      ],
+      "color": "#2a363b",
+      "bgcolor": "#3f5159"
+    },
+    {
+      "id": 6,
+      "type": "EmptyLatentImage",
+      "pos": [
+        19380,
+        7690
+      ],
+      "size": [
+        240,
+        106
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            24
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.65",
+        "Node name for S&R": "EmptyLatentImage",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "width": true,
+            "height": true,
+            "batch_size": true
+          },
+          "version": "7.0.1"
+        }
+      },
+      "widgets_values": [
+        1152,
+        1736,
+        1
+      ],
+      "color": "#323",
+      "bgcolor": "#535"
+    },
+    {
+      "id": 20,
+      "type": "CLIPTextEncode",
+      "pos": [
+        19150,
+        7080
+      ],
+      "size": [
+        470,
+        490
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 37
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            15,
+            22,
+            46
+          ]
+        }
+      ],
+      "title": "✅ Positive Prompt (What You Want)",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.65",
+        "Node name for S&R": "CLIPTextEncode",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "text": true
+          },
+          "version": "7.0.1"
+        }
+      },
+      "widgets_values": [
+        "You are a masterful AI artist who creates high-quality, detailed anime-style illustrations using SDXL prompts. Focus on composition, lighting, anatomy, and emotion to produce stunning, professional anime artwork: anime, Anime-style digital painting of a beautiful elf woman with long, flowing white hair, blue eyes, and pointed ears, wearing a gold leaf headpiece and ornate armor with intricate designs. She has a serene expression and is surrounded by a magical forest setting with blue lights and delicate flowers. The art style is detailed and vibrant, with a soft, ethereal quality. The woman is positioned in the center of the image, looking off into the distance. 1girl, solo, long_hair, breasts, blue_eyes, hair_ornament, hair_between_eyes, closed_mouth, medium_breasts, upper_body, white_hair, braid, flower, sidelocks, outdoors, pointy_ears, armor, twin_braids, tree, lips, bug, elf, butterfly, nature, blue_flower, forest"
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 34,
+      "type": "CheckpointLoaderSimple",
+      "pos": [
+        18620,
+        7080
+      ],
+      "size": [
+        470,
+        98
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            42
+          ]
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            37
+          ]
+        },
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            39
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.71",
+        "Node name for S&R": "CheckpointLoaderSimple"
+      },
+      "widgets_values": [
+        "zImageTurboAIO_zImageTurboFP8AIO.safetensors"
+      ],
+      "color": "#223",
+      "bgcolor": "#335"
+    }
+  ],
+  "links": [
+    [
+      8,
+      17,
+      0,
+      11,
+      0,
+      "LATENT"
+    ],
+    [
+      10,
+      14,
+      0,
+      12,
+      0,
+      "LATENT"
+    ],
+    [
+      12,
+      11,
+      0,
+      13,
+      0,
+      "IMAGE"
+    ],
+    [
+      13,
+      12,
+      0,
+      13,
+      1,
+      "IMAGE"
+    ],
+    [
+      15,
+      20,
+      0,
+      14,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      17,
+      16,
+      0,
+      14,
+      3,
+      "LATENT"
+    ],
+    [
+      20,
+      17,
+      0,
+      16,
+      0,
+      "LATENT"
+    ],
+    [
+      22,
+      20,
+      0,
+      17,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      24,
+      6,
+      0,
+      17,
+      3,
+      "LATENT"
+    ],
+    [
+      30,
+      11,
+      0,
+      26,
+      0,
+      "IMAGE"
+    ],
+    [
+      31,
+      12,
+      0,
+      27,
+      0,
+      "IMAGE"
+    ],
+    [
+      33,
+      29,
+      0,
+      30,
+      0,
+      "*"
+    ],
+    [
+      34,
+      30,
+      0,
+      11,
+      1,
+      "VAE"
+    ],
+    [
+      35,
+      30,
+      0,
+      31,
+      0,
+      "*"
+    ],
+    [
+      36,
+      31,
+      0,
+      12,
+      1,
+      "VAE"
+    ],
+    [
+      37,
+      34,
+      1,
+      20,
+      0,
+      "CLIP"
+    ],
+    [
+      39,
+      34,
+      2,
+      29,
+      0,
+      "*"
+    ],
+    [
+      40,
+      2,
+      0,
+      14,
+      0,
+      "MODEL"
+    ],
+    [
+      41,
+      2,
+      0,
+      17,
+      0,
+      "MODEL"
+    ],
+    [
+      42,
+      34,
+      0,
+      2,
+      0,
+      "MODEL"
+    ],
+    [
+      46,
+      20,
+      0,
+      40,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      47,
+      40,
+      0,
+      17,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      48,
+      40,
+      0,
+      14,
+      2,
+      "CONDITIONING"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "🎨 Step 4 - Generate Image",
+      "bounding": [
+        19660,
+        7000,
+        570,
+        810
+      ],
+      "color": "#a1309b",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "🔼 Step 5 - Upscale (Optional)",
+      "bounding": [
+        20720,
+        7000,
+        950,
+        1090
+      ],
+      "color": "#b58b2a",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "📦 Step 1 - Load Models",
+      "bounding": [
+        18600,
+        7000,
+        510,
+        210
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 4,
+      "title": "📐 Step 3 - Choose Size",
+      "bounding": [
+        19360,
+        7610,
+        280,
+        200
+      ],
+      "color": "#8AA",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 5,
+      "title": "✍️ Step 2 - Write Prompts",
+      "bounding": [
+        19130,
+        7000,
+        510,
+        590
+      ],
+      "color": "#8A8",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.3855432894295318,
+      "offset": [
+        -17248.734326822923,
+        -6266.7495392252995
+      ]
+    },
+    "frontendVersion": "1.23.4",
+    "ue_links": [],
+    "links_added_by_ue": [],
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true,
+    "workflowRendererVersion": "LG"
+  },
+  "version": 0.4
+}

@@ -1,0 +1,24 @@
+[
+  {
+    "id": "tech_001",
+    "title": "iPhone 16 Pro一个月真实体验",
+    "content": "作为一个安卓转iOS的用户，说说真实感受\n\n【优点】\n1. A18芯片确实流畅\n2. 拍照直出效果好\n3. 生态体验无敌\n4. 钛金属边框手感好\n\n【缺点】\n1. 信号还是老问题\n2. 充电速度感人\n3. 没有长焦有点遗憾\n4. 价格确实贵\n\n【购买建议】\n如果你是：\n- 苹果生态用户 → 建议升级\n- 安卓用户 → 看个人需求\n- 上一代用户 → 没必要换\n\n总结：值得买，但不是必须买\n\n你们用的什么手机？",
+    "category": "tech",
+    "subTopic": "phone",
+    "quality": "excellent",
+    "keyFeatures": "优缺点客观，针对不同人群给建议",
+    "metrics": {"likes": 6754, "collects": 2341},
+    "tags": ["#iPhone16Pro", "#数码测评", "#苹果", "#手机推荐"]
+  },
+  {
+    "id": "tech_002",
+    "title": "学生党平板怎么选？iPad vs 安卓",
+    "content": "被问了无数次，今天统一回复！\n\n【预算3000以内】\n推荐：iPad 10 / 小米平板6\n\niPad 10：\n✅ 系统流畅，软件生态好\n✅ 保值率高\n❌ 配件贵，一代笔不支持\n\n小米平板6：\n✅ 性价比高，配件便宜\n✅ 分屏好用\n❌ 软件适配一般\n\n【预算5000+】\n直接iPad Pro/Air\n学习+画画+轻办公都能搞定\n\n【选购建议】\n- 主要记笔记 → iPad\n- 看网课为主 → 安卓够用\n- 有画画需求 → iPad Pro\n\n你们都用平板做什么？",
+    "category": "tech",
+    "subTopic": "tablet",
+    "quality": "good",
+    "keyFeatures": "按预算分类推荐，对比清晰",
+    "metrics": {"likes": 4532, "collects": 2134},
+    "tags": ["#平板推荐", "#iPad", "#学生党", "#数码选购"]
+  }
+]

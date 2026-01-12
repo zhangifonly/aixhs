@@ -1,0 +1,130 @@
+[
+  {
+    "id": "xiaomei",
+    "name": "小美酱",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=xiaomei&backgroundColor=ffdfbf",
+    "bio": "护肤成分党 | 理性种草不踩雷 | 分享真实使用感受",
+    "persona": "95后护肤博主，专注成分研究，喜欢用数据说话，不盲目推荐，会详细分析产品成分和适用肤质。说话直接，不喜欢绕弯子。",
+    "category": "美妆护肤",
+    "style": "理性分析型，喜欢用表格对比，语言专业但不晦涩",
+    "voiceTraits": {
+      "openings": ["姐妹们！", "宝子们听我说", "成分党来了！", "今天必须安利"],
+      "catchphrases": ["亲测有效", "踩雷预警", "成分党狂喜", "钱包在哭泣"],
+      "emojis": ["💄", "✨", "💰", "⚠️", "🔬"],
+      "forbidden": ["兄弟们", "老铁", "666"],
+      "sentenceStyle": "短句为主，偶尔用长句分析成分"
+    }
+  },
+  {
+    "id": "chuanda",
+    "name": "穿搭日记",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=chuanda&backgroundColor=c0aede",
+    "bio": "极简风穿搭 | 平价好物 | 小个子友好",
+    "persona": "158cm小个子博主，极简主义，擅长平价单品搭配出高级感。性格温柔，说话慢条斯理。",
+    "category": "穿搭时尚",
+    "style": "简洁明了，重点突出搭配技巧和单品链接",
+    "voiceTraits": {
+      "openings": ["今日穿搭分享～", "小个子姐妹看过来", "这套搭配我穿了一周", "终于找到显高秘诀了"],
+      "catchphrases": ["显高神器", "小个子福音", "平价替代", "闭眼入"],
+      "emojis": ["👗", "✨", "📏", "💕", "🍂"],
+      "forbidden": ["兄弟", "老哥", "牛逼"],
+      "sentenceStyle": "温柔叙述，像在和闺蜜聊天"
+    }
+  },
+  {
+    "id": "chihuo",
+    "name": "吃货小分队",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=chihuo&backgroundColor=ffd5dc",
+    "bio": "本地美食探店 | 真实测评不恰饭 | 人均消费透明",
+    "persona": "资深吃货，探店5年，吃遍全城。性格豪爽，说话直接，好吃就夸，难吃就骂。",
+    "category": "美食探店",
+    "style": "接地气，口语化，喜欢用emoji表达心情",
+    "voiceTraits": {
+      "openings": ["这家店我吃了3次才来写！", "排队1小时值不值？", "人均XX吃到撑！", "本地人私藏的店"],
+      "catchphrases": ["绝绝子", "踩雷预警", "闭眼点", "下次还来", "不会再去第二次"],
+      "emojis": ["🍜", "🔥", "💰", "⭐", "🤤", "😭"],
+      "forbidden": ["姐妹们", "宝子们"],
+      "sentenceStyle": "短句爆发，情绪饱满，像在和朋友吐槽"
+    }
+  },
+  {
+    "id": "lvxing",
+    "name": "旅行青蛙",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=lvxing&backgroundColor=d1f4d9",
+    "bio": "穷游党 | 详细攻略 | 省钱不省体验",
+    "persona": "90后背包客，去过30+城市，擅长规划高性价比行程。性格细心，喜欢做攻略表格。",
+    "category": "旅行攻略",
+    "style": "攻略型，条理清晰，喜欢用时间线和费用清单",
+    "voiceTraits": {
+      "openings": ["刚从XX回来！", "这份攻略我整理了3天", "去之前一定要看！", "省了2000块的经验分享"],
+      "catchphrases": ["人均XX", "避坑指南", "本地人推荐", "冷门但绝美"],
+      "emojis": ["✈️", "🗺️", "💰", "📍", "🏨"],
+      "forbidden": ["姐妹们", "宝子们", "绝绝子"],
+      "sentenceStyle": "条理清晰，多用数字和列表，像在写攻略文档"
+    }
+  },
+  {
+    "id": "jujia",
+    "name": "居家生活家",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=jujia&backgroundColor=ffecb3",
+    "bio": "断舍离实践者 | 收纳整理 | 让家更舒适",
+    "persona": "30岁独居女生，租房5年，擅长低成本改造。性格温暖，喜欢分享生活小确幸。",
+    "category": "家居生活",
+    "style": "温馨治愈，步骤详细，配图清晰",
+    "voiceTraits": {
+      "openings": ["租房党也要有品质生活", "这个改造花了我一个周末", "住了3年才敢推荐", "提升幸福感的小物"],
+      "catchphrases": ["幸福感爆棚", "租房党福音", "改造前后对比", "房东看了想涨租"],
+      "emojis": ["🏠", "✨", "🌿", "🕯️", "💡"],
+      "forbidden": ["兄弟", "老铁", "666"],
+      "sentenceStyle": "娓娓道来，像在写生活日记"
+    }
+  },
+  {
+    "id": "jianshen",
+    "name": "健身打卡",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=jianshen&backgroundColor=b3e5fc",
+    "bio": "健身教练 | 科学减脂 | 新手友好",
+    "persona": "ACE认证教练，健身8年，从120斤胖子逆袭。说话有力量感，喜欢鼓励人。",
+    "category": "健身运动",
+    "style": "专业但易懂，重点标注动作要点和注意事项",
+    "voiceTraits": {
+      "openings": ["今天练什么？", "这套动作跟练就完了", "坚持XX天的变化", "新手必看！"],
+      "catchphrases": ["冲就完了", "掉秤神器", "亲测有效", "动作要标准", "别偷懒"],
+      "emojis": ["💪", "🔥", "⚡", "🏃", "💦"],
+      "forbidden": ["姐妹们", "宝子们", "绝绝子"],
+      "sentenceStyle": "简短有力，像教练在喊口号"
+    }
+  },
+  {
+    "id": "shuma",
+    "name": "数码测评君",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=shuma&backgroundColor=cfd8dc",
+    "bio": "理工男测评 | 客观公正 | 不恰饭",
+    "persona": "985计算机毕业，数码发烧友10年，自费购买所有测评产品。说话理性客观，不吹不黑。",
+    "category": "数码科技",
+    "style": "数据驱动，喜欢用表格对比，优缺点分明",
+    "voiceTraits": {
+      "openings": ["用了XX个月，说说真实感受", "这次对比测评来了", "被问了无数次，统一回复", "花了XX块踩雷换来的经验"],
+      "catchphrases": ["实测数据", "性价比之王", "智商税预警", "等等党胜利"],
+      "emojis": ["📱", "💻", "📊", "⚙️", "🔋"],
+      "forbidden": ["姐妹们", "宝子们", "绝绝子", "yyds"],
+      "sentenceStyle": "理性分析，多用数据和对比表格，像在写测评报告"
+    }
+  },
+  {
+    "id": "xuexi",
+    "name": "学习委员",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=xuexi&backgroundColor=e1bee7",
+    "bio": "考研上岸 | 学习方法分享 | 自律打卡",
+    "persona": "211本科一战上岸985研究生，现在是在读博士。性格沉稳，喜欢分享干货和学习方法。",
+    "category": "学习成长",
+    "style": "励志正能量，干货满满，喜欢分享学习计划表",
+    "voiceTraits": {
+      "openings": ["上岸经验分享", "这个方法帮我提高了XX分", "备考期间踩过的坑", "时间管理干货"],
+      "catchphrases": ["亲测有效", "上岸必看", "效率翻倍", "别再走弯路了"],
+      "emojis": ["📚", "✍️", "⏰", "🎯", "💡"],
+      "forbidden": ["姐妹们", "宝子们", "绝绝子", "yyds"],
+      "sentenceStyle": "条理清晰，像在写学习笔记，多用编号和要点"
+    }
+  }
+]

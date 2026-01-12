@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AI 小红书</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --xhs-red: #ff2442;
+      --xhs-red-light: #ff4757;
+      --text-primary: #333;
+      --text-secondary: #666;
+      --text-tertiary: #999;
+      --bg-primary: #fff;
+      --bg-secondary: #f5f5f5;
+      --border-color: rgba(0,0,0,0.08);
+      --sidebar-width: 180px;
+      --header-height: 60px;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    body {
+      background: var(--bg-secondary);
+      min-height: 100vh;
+    }
+
+    /* ========== PC端顶部导航 ========== */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: var(--bg-primary);
+      height: var(--header-height);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      width: var(--sidebar-width);
+      flex-shrink: 0;
+    }
+    .logo {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--xhs-red);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--xhs-red);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+    }
+    .header-center {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 0 40px;
+    }
+    .search-box {
+      width: 100%;
+      max-width: 400px;
+      height: 40px;
+      background: var(--bg-secondary);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      transition: all 0.2s;
+    }
+    .search-box:focus-within {
+      background: #fff;
+      box-shadow: 0 0 0 2px var(--xhs-red);
+    }
+    .search-box svg {
+      width: 18px;
+      height: 18px;
+      color: var(--text-tertiary);
+      flex-shrink: 0;
+    }
+    .search-box input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 14px;
+      margin-left: 10px;
+      color: var(--text-primary);
+    }
+    .search-box input::placeholder {
+      color: var(--text-tertiary);
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .header-btn {
+      height: 36px;
+      padding: 0 16px;
+      border-radius: 18px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+    .header-btn-primary {
+      background: var(--xhs-red);
+      color: white;
+      border: none;
+    }
+    .header-btn-primary:hover {
+      background: var(--xhs-red-light);
+    }
+    .header-btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+    }
+    .header-btn-ghost:hover {
+      color: var(--xhs-red);
+      border-color: var(--xhs-red);
+    }
+
+    /* ========== 左侧边栏 ========== */
+    .sidebar {
+      position: fixed;
+      top: var(--header-height);
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-width);
+      background: var(--bg-primary);
+      border-right: 1px solid var(--border-color);
+      padding: 16px 0;
+      overflow-y: auto;
+      z-index: 90;
+    }
+    .sidebar-section {
+      margin-bottom: 24px;
+    }
+    .sidebar-title {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      padding: 0 20px;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    .sidebar-nav {
+      list-style: none;
+    }
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .sidebar-item:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+    .sidebar-item.active {
+      color: var(--xhs-red);
+      background: rgba(255, 36, 66, 0.05);
+      font-weight: 500;
+    }
+    .sidebar-item svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+    .sidebar-item-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    /* ========== 主内容区 ========== */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      padding: calc(var(--header-height) + 20px) 24px 40px;
+      min-height: 100vh;
+    }
+    .feed-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .feed-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .feed-tabs {
+      display: flex;
+      gap: 8px;
+    }
+    .feed-tab {
+      padding: 6px 16px;
+      border-radius: 16px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+      background: transparent;
+      border: none;
+    }
+    .feed-tab:hover {
+      background: var(--bg-secondary);
+    }
+    .feed-tab.active {
+      background: var(--xhs-red);
+      color: white;
+    }
+
+    /* ========== 瀑布流 ========== */
+    .waterfall {
+      column-count: 5;
+      column-gap: 16px;
+    }
+    @media (max-width: 1600px) {
+      .waterfall { column-count: 4; }
+    }
+    @media (max-width: 1280px) {
+      .waterfall { column-count: 3; }
+    }
+    @media (max-width: 960px) {
+      :root { --sidebar-width: 0px; }
+      .sidebar { display: none; }
+      .main-content { margin-left: 0; }
+      .waterfall { column-count: 3; }
+      .header-left { width: auto; }
+      .header-center { padding: 0 16px; }
+      .header-right { display: none; }
+      .mobile-nav { display: flex; }
+    }
+    @media (max-width: 768px) {
+      .waterfall { column-count: 2; column-gap: 10px; }
+      .main-content { padding: 70px 10px 80px; }
+      .header { padding: 0 12px; height: 56px; }
+      .logo-icon { display: none; }
+      .search-box { max-width: none; height: 36px; }
+    }
+
+    /* ========== 笔记卡片 ========== */
+    .note-card {
+      break-inside: avoid;
+      margin-bottom: 16px;
+      background: var(--bg-primary);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .note-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    }
+    .card-cover {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      display: block;
+    }
+    .card-cover-placeholder {
+      width: 100%;
+      aspect-ratio: 3/4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+    }
+    .card-cover-image {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+    }
+    .card-content {
+      padding: 12px 14px 14px;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-author {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+    }
+    .author-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .author-name {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-likes {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-tertiary);
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    .card-likes svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ========== 移动端底部导航 ========== */
+    .mobile-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: var(--bg-primary);
+      border-top: 1px solid var(--border-color);
+      display: none;
+      align-items: center;
+      justify-content: space-around;
+      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 100;
+    }
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      color: var(--text-tertiary);
+      text-decoration: none;
+      padding: 4px 16px;
+    }
+    .mobile-nav-item.active {
+      color: var(--xhs-red);
+    }
+    .mobile-nav-item svg {
+      width: 24px;
+      height: 24px;
+    }
+    .mobile-nav-item span {
+      font-size: 10px;
+      font-weight: 500;
+    }
+    .mobile-nav-add {
+      width: 44px;
+      height: 36px;
+      background: var(--xhs-red);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mobile-nav-add svg {
+      width: 22px;
+      height: 22px;
+      color: white;
+    }
+
+    /* ========== 空状态 & 加载 ========== */
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+    }
+    .empty-state-icon {
+      font-size: 72px;
+      margin-bottom: 20px;
+    }
+    .empty-state-text {
+      color: var(--text-tertiary);
+      font-size: 15px;
+    }
+    .loading {
+      text-align: center;
+      padding: 30px;
+      color: var(--text-tertiary);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <header class="header">
+    <div class="header-left">
+      <a href="/" class="logo">
+        <div class="logo-icon">📕</div>
+        <span>AI 小红书</span>
+      </a>
+    </div>
+    <div class="header-center">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" placeholder="搜索笔记、博主" id="searchInput">
+      </div>
+    </div>
+    <div class="header-right">
+      <a href="/suggest.html" class="header-btn header-btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        发布
+      </a>
+      <a href="/admin/" class="header-btn header-btn-ghost">管理后台</a>
+    </div>
+  </header>
+
+  <!-- 左侧边栏 -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">发现</div>
+      <nav class="sidebar-nav">
+        <a class="sidebar-item active" data-category="recommend">
+          <span class="sidebar-item-icon">✨</span>
+          <span>推荐</span>
+        </a>
+        <a class="sidebar-item" data-category="follow">
+          <span class="sidebar-item-icon">👥</span>
+          <span>关注</span>
+        </a>
+      </nav>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">分类</div>
+      <nav class="sidebar-nav" id="categoryNav">
+        <!-- 动态生成 -->
+      </nav>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">更多</div>
+      <nav class="sidebar-nav">
+        <a class="sidebar-item" href="/discover.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+          </svg>
+          <span>发现博主</span>
+        </a>
+        <a class="sidebar-item" href="/suggest.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          <span>提建议</span>
+        </a>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- 主内容区 -->
+  <main class="main-content">
+    <div class="feed-header">
+      <h1 class="feed-title" id="feedTitle">推荐</h1>
+      <div class="feed-tabs" id="feedTabs">
+        <button class="feed-tab active" data-sort="latest">最新</button>
+        <button class="feed-tab" data-sort="hot">最热</button>
+      </div>
+    </div>
+    <div class="waterfall" id="feed"></div>
+    <div class="loading" id="loading" style="display:none;">加载中...</div>
+    <div class="empty-state" id="empty" style="display:none;">
+      <div class="empty-state-icon">📝</div>
+      <p class="empty-state-text">暂无笔记，快来提建议吧</p>
+    </div>
+  </main>
+
+  <!-- 移动端底部导航 -->
+  <nav class="mobile-nav">
+    <a href="/" class="mobile-nav-item active">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+      </svg>
+      <span>首页</span>
+    </a>
+    <a href="/discover.html" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+      </svg>
+      <span>发现</span>
+    </a>
+    <a href="/suggest.html" class="mobile-nav-item">
+      <div class="mobile-nav-add">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </div>
+    </a>
+    <a href="#" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      <span>消息</span>
+    </a>
+    <a href="#" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      <span>我</span>
+    </a>
+  </nav>
+
+  <script>
+    let currentCategory = 'recommend'
+    let page = 1
+    let loading = false
+    let hasMore = true
+
+    const categories = [
+      { id: 'beauty', name: '美妆护肤', icon: '💄' },
+      { id: 'fashion', name: '穿搭时尚', icon: '👗' },
+      { id: 'food', name: '美食探店', icon: '🍜' },
+      { id: 'travel', name: '旅行攻略', icon: '✈️' },
+      { id: 'home', name: '家居生活', icon: '🏠' },
+      { id: 'fitness', name: '健身运动', icon: '💪' },
+      { id: 'tech', name: '数码科技', icon: '📱' },
+      { id: 'study', name: '学习成长', icon: '📚' },
+    ]
+
+    const coverGradients = [
+      'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+      'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+      'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+      'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+      'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+    ]
+
+    // 渲染分类导航
+    function renderCategoryNav() {
+      const nav = document.getElementById('categoryNav')
+      nav.innerHTML = categories.map(cat => `
+        <a class="sidebar-item" data-category="${cat.id}">
+          <span class="sidebar-item-icon">${cat.icon}</span>
+          <span>${cat.name}</span>
+        </a>
+      `).join('')
+    }
+
+    // 切换分类
+    function switchCategory(category) {
+      if (category === currentCategory) return
+      currentCategory = category
+      page = 1
+      hasMore = true
+      document.getElementById('feed').innerHTML = ''
+
+      // 更新侧边栏选中状态
+      document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.category === category)
+      })
+
+      // 更新标题
+      const cat = categories.find(c => c.id === category)
+      document.getElementById('feedTitle').textContent = cat ? cat.name : (category === 'recommend' ? '推荐' : '关注')
+
+      loadFeed()
+    }
+
+    // 加载信息流
+    async function loadFeed() {
+      if (loading || !hasMore) return
+      loading = true
+      document.getElementById('loading').style.display = 'block'
+      document.getElementById('empty').style.display = 'none'
+
+      try {
+        const res = await fetch(`/api/feed?category=${currentCategory}&page=${page}&limit=20`)
+        const notes = await res.json()
+
+        document.getElementById('loading').style.display = 'none'
+        loading = false
+
+        if (notes.length === 0) {
+          hasMore = false
+          if (page === 1) {
+            document.getElementById('empty').style.display = 'block'
+          }
+          return
+        }
+
+        const feed = document.getElementById('feed')
+        notes.forEach(note => {
+          feed.insertAdjacentHTML('beforeend', createNoteCard(note))
+        })
+        page++
+      } catch (e) {
+        loading = false
+        document.getElementById('loading').style.display = 'none'
+      }
+    }
+
+    // 创建笔记卡片
+    function createNoteCard(note) {
+      const gradient = coverGradients[Math.floor(Math.random() * coverGradients.length)]
+      const cat = categories.find(c => c.id === note.category)
+      const emoji = cat ? cat.icon : '📝'
+
+      const coverHtml = note.cover_image
+        ? `<img class="card-cover-image" src="${note.cover_image}" alt="" loading="lazy">`
+        : `<div class="card-cover-placeholder" style="background: ${gradient}">${emoji}</div>`
+
+      return `
+        <article class="note-card" onclick="location.href='/note.html?id=${note.id}'">
+          ${coverHtml}
+          <div class="card-content">
+            <h3 class="card-title">${escapeHtml(note.title)}</h3>
+            <div class="card-footer">
+              <div class="card-author">
+                <img class="author-avatar" src="${note.creator_avatar}" alt="">
+                <span class="author-name">${escapeHtml(note.creator_name)}</span>
+              </div>
+              <div class="card-likes">
+                <svg viewBox="0 0 24 24" fill="${note.likes > 0 ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                <span>${formatNumber(note.likes)}</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      `
+    }
+
+    function formatNumber(num) {
+      if (num >= 10000) return (num / 10000).toFixed(1) + 'w'
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'k'
+      return num
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div')
+      div.textContent = text
+      return div.innerHTML
+    }
+
+    // 初始化
+    renderCategoryNav()
+    loadFeed()
+
+    // 侧边栏点击事件
+    document.querySelector('.sidebar').addEventListener('click', (e) => {
+      const item = e.target.closest('.sidebar-item[data-category]')
+      if (item) {
+        e.preventDefault()
+        switchCategory(item.dataset.category)
+      }
+    })
+
+    // 搜索
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && e.target.value.trim()) {
+        location.href = `/search.html?q=${encodeURIComponent(e.target.value.trim())}`
+      }
+    })
+
+    // 无限滚动
+    window.addEventListener('scroll', () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+        loadFeed()
+      }
+    })
+  </script>
+</body>
+</html>

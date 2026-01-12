@@ -1,0 +1,204 @@
+{
+  "platform": {
+    "name": "小红书",
+    "slogan": "标记我的生活",
+    "targetAudience": "18-35岁女性为主，追求品质生活",
+    "contentTone": "真实、亲切、有用、有趣"
+  },
+  "writingPrinciples": {
+    "authenticity": "真实分享，不夸大不虚假",
+    "practicality": "内容实用，能解决实际问题",
+    "personality": "有个人特色，不千篇一律",
+    "interaction": "引导互动，建立连接"
+  },
+  "antiAIDetection": {
+    "description": "避免AI生成痕迹的写作规范",
+    "sentenceVariation": {
+      "rule": "句子长短交替，避免整齐划一",
+      "longSentenceRatio": "30-40%",
+      "shortSentenceRatio": "20-30%",
+      "mediumSentenceRatio": "30-50%",
+      "example": {
+        "bad": "这款产品非常好用。它的质地很清爽。使用后皮肤变得很好。我非常推荐。",
+        "good": "这款真的绝了！！用了一个月，T区出油明显减少。质地超清爽，上脸秒吸收，完全不会搓泥。姐妹们有同款吗？"
+      }
+    },
+    "pronounLimits": {
+      "firstPerson": {
+        "maxPerParagraph": 3,
+        "alternatives": ["姐妹们", "宝子们", "大家", "你们"]
+      },
+      "questionMarks": {
+        "maxPerArticle": 5,
+        "usage": "用于开头引入或结尾互动，不要连续使用"
+      }
+    },
+    "forbiddenPatterns": [
+      {
+        "pattern": "首先...其次...最后...",
+        "reason": "典型AI结构，过于机械",
+        "alternative": "用数字列表或自然过渡"
+      },
+      {
+        "pattern": "总而言之/综上所述/总的来说",
+        "reason": "学术论文风格，不符合小红书调性",
+        "alternative": "直接给结论或用emoji分隔"
+      },
+      {
+        "pattern": "值得一提的是",
+        "reason": "AI常用过渡语",
+        "alternative": "直接说重点"
+      },
+      {
+        "pattern": "不仅...而且.../既...又...",
+        "reason": "过于书面化",
+        "alternative": "用口语化表达"
+      },
+      {
+        "pattern": "众所周知/不言而喻",
+        "reason": "空洞的开场白",
+        "alternative": "直接切入主题"
+      },
+      {
+        "pattern": "在...方面/从...角度",
+        "reason": "学术化表达",
+        "alternative": "用具体场景描述"
+      }
+    ],
+    "encouragedPatterns": [
+      {
+        "pattern": "感叹句开头",
+        "example": "姐妹们！！！今天必须给你们安利",
+        "effect": "制造情绪，吸引注意"
+      },
+      {
+        "pattern": "口语化表达",
+        "example": "真的绝了、太可了、救命、笑死",
+        "effect": "增加亲切感和真实感"
+      },
+      {
+        "pattern": "具体数字",
+        "example": "用了28天、花了328块、瘦了5斤",
+        "effect": "增加可信度"
+      },
+      {
+        "pattern": "emoji点缀",
+        "example": "📍地址 💰价格 ⏰时间 ✅推荐 ❌避雷",
+        "effect": "视觉分隔，便于阅读"
+      },
+      {
+        "pattern": "互动式结尾",
+        "example": "姐妹们觉得呢？评论区聊聊～",
+        "effect": "引导互动，增加评论"
+      }
+    ]
+  },
+  "titleRules": {
+    "length": {
+      "min": 8,
+      "max": 22,
+      "optimal": "12-18字"
+    },
+    "elements": [
+      {
+        "name": "数字",
+        "example": "5款、3天、100元",
+        "effect": "具体可量化，吸引点击"
+      },
+      {
+        "name": "人群标签",
+        "example": "油皮、小个子、学生党",
+        "effect": "精准定位目标读者"
+      },
+      {
+        "name": "效果词",
+        "example": "绝了、救星、亲妈、神器",
+        "effect": "制造期待感"
+      },
+      {
+        "name": "emoji",
+        "example": "💄👗🍜",
+        "effect": "视觉吸引，品类标识"
+      }
+    ],
+    "forbiddenInTitle": [
+      "震惊",
+      "必看",
+      "不转不是中国人",
+      "99%的人不知道"
+    ]
+  },
+  "contentStructure": {
+    "opening": {
+      "maxLines": 3,
+      "styles": [
+        "感叹句引入：姐妹们！！！",
+        "痛点共鸣：作为一个XX，我太懂XX的痛了",
+        "结果先行：用了XX天，终于XX了",
+        "悬念引入：被问了无数次，今天统一回复"
+      ],
+      "avoid": [
+        "大家好，我是XXX",
+        "今天给大家分享",
+        "最近很多人问我"
+      ]
+    },
+    "body": {
+      "paragraphLength": "3-5行为宜，避免大段文字",
+      "listUsage": "善用列表和emoji分隔",
+      "detailLevel": "具体到品牌、价格、使用时长等"
+    },
+    "closing": {
+      "styles": [
+        "互动提问：姐妹们有同款吗？",
+        "征求意见：你们还想看什么？",
+        "鼓励行动：快去试试吧！",
+        "预告下期：下期分享XX"
+      ],
+      "avoid": [
+        "以上就是今天的分享",
+        "希望对大家有帮助",
+        "感谢观看"
+      ]
+    }
+  },
+  "tagRules": {
+    "count": {
+      "min": 3,
+      "max": 8,
+      "optimal": 5
+    },
+    "types": [
+      {
+        "type": "品类标签",
+        "example": "#护肤 #穿搭 #美食",
+        "priority": "必须"
+      },
+      {
+        "type": "细分标签",
+        "example": "#油皮护肤 #小个子穿搭",
+        "priority": "推荐"
+      },
+      {
+        "type": "热点标签",
+        "example": "#双十一 #春节",
+        "priority": "可选"
+      },
+      {
+        "type": "情感标签",
+        "example": "#好物分享 #真实测评",
+        "priority": "可选"
+      }
+    ]
+  },
+  "qualityChecklist": [
+    "标题是否吸引人且不超过22字",
+    "开头是否直接切入主题",
+    "是否有具体的数字和细节",
+    "是否避免了AI常见句式",
+    "句子长短是否有变化",
+    "是否有互动引导",
+    "标签是否相关且数量适中",
+    "整体是否像真人写的"
+  ]
+}

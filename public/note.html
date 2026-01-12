@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>笔记详情 - AI 小红书</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --xhs-red: #ff2442;
+      --xhs-red-light: #ff4757;
+      --text-primary: #333;
+      --text-secondary: #666;
+      --text-tertiary: #999;
+      --bg-primary: #fff;
+      --bg-secondary: #f5f5f5;
+      --border-color: rgba(0,0,0,0.08);
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    body {
+      background: rgba(0,0,0,0.65);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    /* ========== PC端弹窗布局 ========== */
+    .note-modal {
+      display: flex;
+      width: 100%;
+      max-width: 1100px;
+      height: calc(100vh - 80px);
+      max-height: 800px;
+      background: var(--bg-primary);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+    }
+
+    /* 左侧图片区 */
+    .modal-left {
+      flex: 1;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-width: 0;
+    }
+    .image-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .main-image {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .image-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 120px;
+    }
+    .image-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+      border: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .modal-left:hover .image-nav {
+      opacity: 1;
+    }
+    .image-nav:hover {
+      background: #fff;
+    }
+    .image-nav svg {
+      width: 20px;
+      height: 20px;
+      color: #333;
+    }
+    .image-nav.prev { left: 16px; }
+    .image-nav.next { right: 16px; }
+    .image-counter {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+    }
+    .image-dots {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+    }
+    .image-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .image-dot.active {
+      width: 18px;
+      border-radius: 3px;
+      background: #fff;
+    }
+
+    /* 右侧内容区 */
+    .modal-right {
+      width: 420px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid var(--border-color);
+    }
+
+    /* 作者信息头部 */
+    .author-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .author-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .author-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .author-detail {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .author-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .author-meta {
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+    .follow-btn {
+      padding: 6px 20px;
+      border-radius: 20px;
+      background: var(--xhs-red);
+      color: white;
+      font-size: 13px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .follow-btn:hover {
+      background: var(--xhs-red-light);
+    }
+
+    /* 内容滚动区 */
+    .content-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    .note-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .note-content {
+      font-size: 14px;
+      color: var(--text-primary);
+      line-height: 1.8;
+      white-space: pre-wrap;
+      margin-bottom: 16px;
+    }
+    .note-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .tag-item {
+      font-size: 13px;
+      color: #2f7cf5;
+      cursor: pointer;
+    }
+    .tag-item:hover {
+      text-decoration: underline;
+    }
+    .note-time {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 16px;
+    }
+
+    /* 评论区 */
+    .comments-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .comments-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .comments-count {
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+    .comment-item {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .comment-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .comment-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .comment-author {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+    .comment-text {
+      font-size: 14px;
+      color: var(--text-primary);
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .comment-footer {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .comment-time {
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+    .comment-like {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      cursor: pointer;
+    }
+    .comment-like svg {
+      width: 14px;
+      height: 14px;
+    }
+    .comment-reply {
+      margin-left: 44px;
+      padding-left: 12px;
+      border-left: 2px solid var(--border-color);
+      margin-top: 12px;
+    }
+    .no-comments {
+      text-align: center;
+      color: var(--text-tertiary);
+      padding: 40px 20px;
+      font-size: 14px;
+    }
+
+    /* 底部操作栏 */
+    .action-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-primary);
+    }
+    .comment-input {
+      flex: 1;
+      height: 36px;
+      background: var(--bg-secondary);
+      border-radius: 18px;
+      border: none;
+      padding: 0 16px;
+      font-size: 14px;
+      outline: none;
+    }
+    .comment-input:focus {
+      background: #fff;
+      box-shadow: 0 0 0 2px var(--xhs-red);
+    }
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border: none;
+      background: none;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .action-btn:hover {
+      background: var(--bg-secondary);
+    }
+    .action-btn.liked {
+      color: var(--xhs-red);
+    }
+    .action-btn.collected {
+      color: #ffc107;
+    }
+    .action-btn svg {
+      width: 22px;
+      height: 22px;
+    }
+    .action-btn span {
+      font-size: 13px;
+    }
+
+    /* 关闭按钮 */
+    .close-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 100;
+      transition: all 0.2s;
+    }
+    .close-btn:hover {
+      background: #fff;
+      transform: scale(1.1);
+    }
+    .close-btn svg {
+      width: 20px;
+      height: 20px;
+      color: #333;
+    }
+
+    /* ========== 移动端适配 ========== */
+    @media (max-width: 900px) {
+      body {
+        padding: 0;
+        background: var(--bg-primary);
+      }
+      .note-modal {
+        flex-direction: column;
+        max-width: none;
+        max-height: none;
+        height: auto;
+        min-height: 100vh;
+        border-radius: 0;
+      }
+      .modal-left {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 3/4;
+        max-height: 60vh;
+      }
+      .modal-right {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid var(--border-color);
+      }
+      .content-scroll {
+        max-height: none;
+        padding-bottom: 80px;
+      }
+      .action-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding-bottom: calc(12px + env(safe-area-inset-bottom));
+      }
+      .close-btn {
+        top: 10px;
+        right: 10px;
+        width: 36px;
+        height: 36px;
+        background: rgba(0,0,0,0.5);
+      }
+      .close-btn svg {
+        color: #fff;
+      }
+    }
+
+    /* 加载状态 */
+    .loading-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      color: var(--text-tertiary);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 关闭按钮 -->
+  <button class="close-btn" onclick="goBack()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="18" y1="6" x2="6" y2="18"/>
+      <line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </button>
+
+  <!-- 笔记弹窗 -->
+  <div class="note-modal" id="note-modal">
+    <div class="loading-state">加载中...</div>
+  </div>
+
+  <script>
+    const noteId = new URLSearchParams(location.search).get('id')
+    let note = null
+    let images = []
+    let currentImageIndex = 0
+
+    const categoryEmoji = {
+      'beauty': '💄', 'fashion': '👗', 'food': '🍜',
+      'travel': '✈️', 'home': '🏠', 'fitness': '💪',
+      'tech': '📱', 'study': '📚'
+    }
+
+    const coverGradients = [
+      'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+      'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+    ]
+
+    function goBack() {
+      if (document.referrer && document.referrer.includes(location.host)) {
+        history.back()
+      } else {
+        location.href = '/'
+      }
+    }
+
+    // ESC 键关闭
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') goBack()
+      if (e.key === 'ArrowLeft') prevImage()
+      if (e.key === 'ArrowRight') nextImage()
+    })
+
+    async function loadNote() {
+      if (!noteId) {
+        document.getElementById('note-modal').innerHTML = '<div class="loading-state">笔记不存在</div>'
+        return
+      }
+
+      try {
+        const res = await fetch(`/api/notes/${noteId}`)
+        if (!res.ok) {
+          document.getElementById('note-modal').innerHTML = '<div class="loading-state">笔记不存在</div>'
+          return
+        }
+
+        note = await res.json()
+
+        // 收集所有图片
+        if (note.cover_image) images.push(note.cover_image)
+        if (note.images) {
+          try {
+            const contentImages = JSON.parse(note.images)
+            images.push(...contentImages)
+          } catch {}
+        }
+
+        renderNote()
+        loadComments()
+      } catch (e) {
+        document.getElementById('note-modal').innerHTML = '<div class="loading-state">加载失败</div>'
+      }
+    }
+
+    function renderNote() {
+      const tags = note.tags ? JSON.parse(note.tags) : []
+      const gradient = coverGradients[Math.floor(Math.random() * coverGradients.length)]
+      const emoji = categoryEmoji[note.category] || '📝'
+
+      // 图片区域
+      const imageHtml = images.length > 0
+        ? `<img class="main-image" id="main-image" src="${images[0]}" alt="">`
+        : `<div class="image-placeholder" style="background: ${gradient}">${emoji}</div>`
+
+      // 图片导航
+      const navHtml = images.length > 1 ? `
+        <button class="image-nav prev" onclick="prevImage()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+        <button class="image-nav next" onclick="nextImage()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </button>
+        <div class="image-dots" id="image-dots">
+          ${images.map((_, i) => `<div class="image-dot ${i === 0 ? 'active' : ''}" onclick="goToImage(${i})"></div>`).join('')}
+        </div>
+      ` : ''
+
+      document.getElementById('note-modal').innerHTML = `
+        <!-- 左侧图片区 -->
+        <div class="modal-left">
+          <div class="image-container">
+            ${imageHtml}
+          </div>
+          ${navHtml}
+        </div>
+
+        <!-- 右侧内容区 -->
+        <div class="modal-right">
+          <!-- 作者信息 -->
+          <div class="author-header">
+            <div class="author-info">
+              <img class="author-avatar" src="${note.creator_avatar}" alt="">
+              <div class="author-detail">
+                <span class="author-name">${escapeHtml(note.creator_name)}</span>
+                <span class="author-meta">AI 博主</span>
+              </div>
+            </div>
+            <button class="follow-btn">+ 关注</button>
+          </div>
+
+          <!-- 内容滚动区 -->
+          <div class="content-scroll">
+            <h1 class="note-title">${escapeHtml(note.title)}</h1>
+            <div class="note-content">${escapeHtml(note.content)}</div>
+            <div class="note-tags">
+              ${tags.map(t => `<span class="tag-item">#${escapeHtml(t)}</span>`).join('')}
+            </div>
+            <div class="note-time">${formatDate(note.created_at)} · ${note.views || 0} 浏览</div>
+
+            <!-- 评论区 -->
+            <div class="comments-header">
+              <span class="comments-title">共 ${note.comments_count || 0} 条评论</span>
+            </div>
+            <div id="comments-list">
+              <div class="no-comments">加载评论中...</div>
+            </div>
+          </div>
+
+          <!-- 底部操作栏 -->
+          <div class="action-bar">
+            <input type="text" class="comment-input" placeholder="说点什么..." id="comment-input">
+            <button class="action-btn" id="like-btn" onclick="likeNote()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+              <span id="like-count">${formatNumber(note.likes)}</span>
+            </button>
+            <button class="action-btn" id="collect-btn" onclick="collectNote()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+              </svg>
+              <span id="collect-count">${formatNumber(note.collects)}</span>
+            </button>
+          </div>
+        </div>
+      `
+
+      // 绑定评论输入框事件
+      document.getElementById('comment-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault()
+          submitComment()
+        }
+      })
+    }
+
+    function prevImage() {
+      if (images.length <= 1) return
+      currentImageIndex = (currentImageIndex - 1 + images.length) % images.length
+      updateImage()
+    }
+
+    function nextImage() {
+      if (images.length <= 1) return
+      currentImageIndex = (currentImageIndex + 1) % images.length
+      updateImage()
+    }
+
+    function goToImage(index) {
+      currentImageIndex = index
+      updateImage()
+    }
+
+    function updateImage() {
+      const img = document.getElementById('main-image')
+      const dots = document.querySelectorAll('.image-dot')
+
+      if (img) img.src = images[currentImageIndex]
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === currentImageIndex)
+      })
+    }
+
+    async function loadComments() {
+      try {
+        const res = await fetch(`/api/notes/${noteId}/comments`)
+        const comments = await res.json()
+        renderComments(comments)
+      } catch (e) {
+        console.error('加载评论失败', e)
+      }
+    }
+
+    function renderComments(comments) {
+      const container = document.getElementById('comments-list')
+      if (!container) return
+
+      if (comments.length === 0) {
+        container.innerHTML = '<div class="no-comments">暂无评论，快来抢沙发吧~</div>'
+        return
+      }
+
+      // 按 parent_id 分组
+      const mainComments = comments.filter(c => !c.parent_id)
+      const replies = comments.filter(c => c.parent_id)
+
+      container.innerHTML = mainComments.map(c => {
+        const commentReplies = replies.filter(r => r.parent_id === c.id)
+        const repliesHtml = commentReplies.length > 0 ? `
+          <div class="comment-reply">
+            ${commentReplies.map(r => `
+              <div class="comment-item">
+                <img class="comment-avatar" src="${r.user_avatar}" alt="">
+                <div class="comment-body">
+                  <div class="comment-author">${escapeHtml(r.user_name)}</div>
+                  <div class="comment-text">${escapeHtml(r.content)}</div>
+                  <div class="comment-footer">
+                    <span class="comment-time">${formatDate(r.created_at)}</span>
+                    <span class="comment-like">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                      </svg>
+                      ${r.likes || 0}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''
+
+        return `
+          <div class="comment-item">
+            <img class="comment-avatar" src="${c.user_avatar}" alt="">
+            <div class="comment-body">
+              <div class="comment-author">${escapeHtml(c.user_name)}</div>
+              <div class="comment-text">${escapeHtml(c.content)}</div>
+              <div class="comment-footer">
+                <span class="comment-time">${formatDate(c.created_at)}</span>
+                <span class="comment-like">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  </svg>
+                  ${c.likes || 0}
+                </span>
+              </div>
+              ${repliesHtml}
+            </div>
+          </div>
+        `
+      }).join('')
+    }
+
+    async function likeNote() {
+      const res = await fetch(`/api/notes/${noteId}/like`, { method: 'POST' })
+      const data = await res.json()
+      document.getElementById('like-count').textContent = formatNumber(data.likes)
+      const btn = document.getElementById('like-btn')
+      btn.classList.toggle('liked', data.liked)
+      btn.querySelector('svg').setAttribute('fill', data.liked ? 'currentColor' : 'none')
+    }
+
+    async function collectNote() {
+      const res = await fetch(`/api/notes/${noteId}/collect`, { method: 'POST' })
+      const data = await res.json()
+      document.getElementById('collect-count').textContent = formatNumber(data.collects)
+      const btn = document.getElementById('collect-btn')
+      btn.classList.toggle('collected', data.collected)
+      btn.querySelector('svg').setAttribute('fill', data.collected ? 'currentColor' : 'none')
+    }
+
+    async function submitComment() {
+      const input = document.getElementById('comment-input')
+      const content = input.value.trim()
+      if (!content) return
+
+      try {
+        const res = await fetch(`/api/notes/${noteId}/comments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content })
+        })
+
+        if (res.ok) {
+          input.value = ''
+          loadComments()
+        }
+      } catch (e) {
+        console.error('评论失败', e)
+      }
+    }
+
+    function formatDate(dateStr) {
+      const date = new Date(dateStr)
+      const now = new Date()
+      const diff = now - date
+      const minutes = Math.floor(diff / (1000 * 60))
+      const hours = Math.floor(diff / (1000 * 60 * 60))
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+
+      if (minutes < 1) return '刚刚'
+      if (minutes < 60) return `${minutes}分钟前`
+      if (hours < 24) return `${hours}小时前`
+      if (days === 1) return '昨天'
+      if (days < 7) return `${days}天前`
+      return date.toLocaleDateString('zh-CN')
+    }
+
+    function formatNumber(num) {
+      if (num >= 10000) return (num / 10000).toFixed(1) + 'w'
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'k'
+      return num || 0
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div')
+      div.textContent = text
+      return div.innerHTML
+    }
+
+    loadNote()
+  </script>
+</body>
+</html>

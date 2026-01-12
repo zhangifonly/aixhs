@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>笔记管理 - AI 小红书后台</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --xhs-red: #ff2442;
+      --text-primary: #333;
+      --text-secondary: #666;
+      --text-tertiary: #999;
+      --bg-primary: #fff;
+      --bg-secondary: #f5f7fa;
+      --border-color: #e4e7ed;
+      --sidebar-width: 220px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Noto Sans SC', -apple-system, sans-serif; }
+    body { background: var(--bg-secondary); min-height: 100vh; }
+
+    .sidebar {
+      position: fixed; top: 0; left: 0; width: var(--sidebar-width); height: 100vh;
+      background: var(--bg-primary); border-right: 1px solid var(--border-color);
+      display: flex; flex-direction: column;
+    }
+    .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border-color); }
+    .sidebar-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-icon {
+      width: 36px; height: 36px; background: var(--xhs-red); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 14px;
+    }
+    .logo-text { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+    .sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+    .nav-section { margin-bottom: 24px; }
+    .nav-section-title { font-size: 12px; color: var(--text-tertiary); padding: 8px 12px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 8px;
+      color: var(--text-secondary); text-decoration: none; margin-bottom: 4px;
+    }
+    .nav-item:hover { background: var(--bg-secondary); color: var(--text-primary); }
+    .nav-item.active { background: #fff0f0; color: var(--xhs-red); }
+    .nav-item svg { width: 20px; height: 20px; }
+
+    .main-content { margin-left: var(--sidebar-width); min-height: 100vh; }
+    .topbar {
+      height: 60px; background: var(--bg-primary); border-bottom: 1px solid var(--border-color);
+      display: flex; align-items: center; justify-content: space-between; padding: 0 24px;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-title { font-size: 18px; font-weight: 600; color: var(--text-primary); }
+    .topbar-actions { display: flex; gap: 12px; }
+    .topbar-btn {
+      display: flex; align-items: center; gap: 6px; padding: 8px 16px;
+      background: var(--xhs-red); color: white; border: none; border-radius: 6px;
+      font-size: 14px; cursor: pointer;
+    }
+    .topbar-btn svg { width: 16px; height: 16px; }
+
+    .content { padding: 24px; }
+    .card {
+      background: var(--bg-primary); border-radius: 12px; border: 1px solid var(--border-color);
+    }
+    .card-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--border-color);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-title { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+
+    .filters { display: flex; gap: 12px; }
+    .filter-select {
+      padding: 6px 12px; border: 1px solid var(--border-color); border-radius: 6px;
+      font-size: 13px; color: var(--text-secondary); background: var(--bg-primary);
+    }
+
+    .table { width: 100%; border-collapse: collapse; }
+    .table th, .table td {
+      padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border-color);
+    }
+    .table th { font-size: 13px; font-weight: 500; color: var(--text-tertiary); background: var(--bg-secondary); }
+    .table td { font-size: 14px; color: var(--text-primary); }
+    .table tr:hover { background: var(--bg-secondary); }
+
+    .table-cover {
+      width: 60px; height: 80px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center; font-size: 24px;
+    }
+    .table-title {
+      max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .table-avatar {
+      width: 28px; height: 28px; border-radius: 50%; vertical-align: middle; margin-right: 8px;
+    }
+    .table-status {
+      display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px;
+    }
+    .table-status.published { background: #f0fff4; color: #52c41a; }
+    .table-status.draft { background: #f5f5f5; color: #999; }
+
+    .table-actions { display: flex; gap: 8px; }
+    .table-actions button {
+      padding: 4px 10px; border: 1px solid var(--border-color); background: var(--bg-primary);
+      border-radius: 4px; font-size: 12px; cursor: pointer; color: var(--text-secondary);
+    }
+    .table-actions button:hover { background: var(--bg-secondary); }
+    .table-actions button.danger { color: var(--xhs-red); border-color: var(--xhs-red); }
+
+    .pagination {
+      display: flex; align-items: center; justify-content: center; gap: 8px; padding: 20px;
+    }
+    .pagination button {
+      padding: 6px 12px; border: 1px solid var(--border-color); background: var(--bg-primary);
+      border-radius: 4px; font-size: 13px; cursor: pointer;
+    }
+    .pagination button:hover { background: var(--bg-secondary); }
+    .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .pagination span { font-size: 13px; color: var(--text-tertiary); }
+
+    .empty-state {
+      padding: 60px; text-align: center; color: var(--text-tertiary); font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main-content { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="/admin/" class="sidebar-logo">
+        <div class="logo-icon">AI</div>
+        <span class="logo-text">小红书后台</span>
+      </a>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">概览</div>
+        <a href="/admin/" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          <span>仪表盘</span>
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">内容管理</div>
+        <a href="/admin/notes.html" class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span>笔记管理</span>
+        </a>
+        <a href="/admin/suggestions.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span>建议管理</span>
+        </a>
+        <a href="/admin/creators.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+          </svg>
+          <span>博主管理</span>
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">AI 生成</div>
+        <a href="/admin/generate.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          <span>AI 创作</span>
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">其他</div>
+        <a href="/" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+          <span>访问前台</span>
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <h1 class="topbar-title">笔记管理</h1>
+      <div class="topbar-actions">
+        <button class="topbar-btn" onclick="location.href='/admin/generate.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          AI 创作笔记
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">全部笔记</span>
+          <div class="filters">
+            <select class="filter-select" id="category-filter" onchange="loadNotes()">
+              <option value="">全部分类</option>
+              <option value="beauty">美妆</option>
+              <option value="fashion">穿搭</option>
+              <option value="food">美食</option>
+              <option value="travel">旅行</option>
+              <option value="home">家居</option>
+              <option value="fitness">健身</option>
+              <option value="tech">数码</option>
+              <option value="study">学习</option>
+            </select>
+          </div>
+        </div>
+        <div id="notes-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="width: 80px">封面</th>
+                <th>标题</th>
+                <th>博主</th>
+                <th>分类</th>
+                <th>数据</th>
+                <th>状态</th>
+                <th>创建时间</th>
+                <th style="width: 120px">操作</th>
+              </tr>
+            </thead>
+            <tbody id="notes-tbody"></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let currentPage = 1
+    const pageSize = 20
+    let totalNotes = 0
+
+    const coverGradients = [
+      'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+      'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+    ]
+
+    const categoryEmoji = {
+      'beauty': '💄', 'fashion': '👗', 'food': '🍜',
+      'travel': '✈️', 'home': '🏠', 'fitness': '💪',
+      'tech': '📱', 'study': '📚'
+    }
+
+    const categoryName = {
+      'beauty': '美妆', 'fashion': '穿搭', 'food': '美食',
+      'travel': '旅行', 'home': '家居', 'fitness': '健身',
+      'tech': '数码', 'study': '学习'
+    }
+
+    async function loadNotes() {
+      try {
+        const res = await fetch(`/api/admin/notes?page=${currentPage}&limit=${pageSize}`)
+        const data = await res.json()
+        totalNotes = data.total
+        renderNotes(data.notes)
+        renderPagination()
+      } catch (e) {
+        console.error('加载失败', e)
+      }
+    }
+
+    function renderNotes(notes) {
+      const tbody = document.getElementById('notes-tbody')
+
+      if (notes.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state">暂无笔记</div></td></tr>`
+        return
+      }
+
+      tbody.innerHTML = notes.map((note, index) => {
+        const gradient = coverGradients[index % coverGradients.length]
+        const emoji = categoryEmoji[note.category] || '📝'
+
+        return `
+          <tr>
+            <td>
+              <div class="table-cover" style="background: ${gradient}">${emoji}</div>
+            </td>
+            <td>
+              <div class="table-title">${escapeHtml(note.title)}</div>
+            </td>
+            <td>
+              <img class="table-avatar" src="${note.creator_avatar}" alt="">
+              ${escapeHtml(note.creator_name)}
+            </td>
+            <td>${categoryName[note.category] || '-'}</td>
+            <td>
+              <div style="font-size:12px;color:#999;">
+                👁 ${formatNumber(note.views)} · ❤️ ${formatNumber(note.likes)}
+              </div>
+            </td>
+            <td><span class="table-status ${note.status}">${note.status === 'published' ? '已发布' : '草稿'}</span></td>
+            <td style="font-size:12px;color:#999;">${formatDate(note.created_at)}</td>
+            <td>
+              <div class="table-actions">
+                <button onclick="viewNote('${note.id}')">查看</button>
+                <button class="danger" onclick="deleteNote('${note.id}')">删除</button>
+              </div>
+            </td>
+          </tr>
+        `
+      }).join('')
+    }
+
+    function renderPagination() {
+      const totalPages = Math.ceil(totalNotes / pageSize)
+      const pagination = document.getElementById('pagination')
+
+      pagination.innerHTML = `
+        <button ${currentPage <= 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})">上一页</button>
+        <span>第 ${currentPage} / ${totalPages} 页，共 ${totalNotes} 条</span>
+        <button ${currentPage >= totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})">下一页</button>
+      `
+    }
+
+    function goToPage(page) {
+      currentPage = page
+      loadNotes()
+    }
+
+    function viewNote(id) {
+      window.open(`/note.html?id=${id}`, '_blank')
+    }
+
+    async function deleteNote(id) {
+      if (!confirm('确定要删除这篇笔记吗？')) return
+
+      try {
+        await fetch(`/api/admin/notes/${id}`, { method: 'DELETE' })
+        loadNotes()
+      } catch (e) {
+        alert('删除失败')
+      }
+    }
+
+    function formatNumber(num) {
+      if (num >= 10000) return (num / 10000).toFixed(1) + 'w'
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'k'
+      return num || 0
+    }
+
+    function formatDate(dateStr) {
+      return new Date(dateStr).toLocaleDateString('zh-CN')
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div')
+      div.textContent = text
+      return div.innerHTML
+    }
+
+    loadNotes()
+  </script>
+</body>
+</html>

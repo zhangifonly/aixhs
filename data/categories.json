@@ -1,0 +1,11 @@
+[
+  { "id": "recommend", "name": "推荐", "icon": "✨" },
+  { "id": "beauty", "name": "美妆护肤", "icon": "💄" },
+  { "id": "fashion", "name": "穿搭时尚", "icon": "👗" },
+  { "id": "food", "name": "美食探店", "icon": "🍜" },
+  { "id": "travel", "name": "旅行攻略", "icon": "✈️" },
+  { "id": "home", "name": "家居生活", "icon": "🏠" },
+  { "id": "fitness", "name": "健身运动", "icon": "💪" },
+  { "id": "tech", "name": "数码科技", "icon": "📱" },
+  { "id": "study", "name": "学习成长", "icon": "📚" }
+]

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>博主管理 - AI 小红书后台</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --xhs-red: #ff2442;
+      --text-primary: #333;
+      --text-secondary: #666;
+      --text-tertiary: #999;
+      --bg-primary: #fff;
+      --bg-secondary: #f5f7fa;
+      --border-color: #e4e7ed;
+      --sidebar-width: 220px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Noto Sans SC', -apple-system, sans-serif; }
+    body { background: var(--bg-secondary); min-height: 100vh; }
+
+    .sidebar {
+      position: fixed; top: 0; left: 0; width: var(--sidebar-width); height: 100vh;
+      background: var(--bg-primary); border-right: 1px solid var(--border-color);
+      display: flex; flex-direction: column;
+    }
+    .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border-color); }
+    .sidebar-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-icon {
+      width: 36px; height: 36px; background: var(--xhs-red); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 14px;
+    }
+    .logo-text { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+    .sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+    .nav-section { margin-bottom: 24px; }
+    .nav-section-title { font-size: 12px; color: var(--text-tertiary); padding: 8px 12px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 8px;
+      color: var(--text-secondary); text-decoration: none; margin-bottom: 4px;
+    }
+    .nav-item:hover { background: var(--bg-secondary); color: var(--text-primary); }
+    .nav-item.active { background: #fff0f0; color: var(--xhs-red); }
+    .nav-item svg { width: 20px; height: 20px; }
+
+    .main-content { margin-left: var(--sidebar-width); min-height: 100vh; }
+    .topbar {
+      height: 60px; background: var(--bg-primary); border-bottom: 1px solid var(--border-color);
+      display: flex; align-items: center; padding: 0 24px;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-title { font-size: 18px; font-weight: 600; color: var(--text-primary); }
+
+    .content { padding: 24px; }
+
+    .creators-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .creator-card {
+      background: var(--bg-primary);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+    }
+    .creator-header {
+      height: 80px;
+      position: relative;
+    }
+    .creator-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 4px solid var(--bg-primary);
+      position: absolute;
+      bottom: -40px;
+      left: 24px;
+      object-fit: cover;
+    }
+    .creator-body {
+      padding: 50px 24px 20px;
+    }
+    .creator-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .creator-id {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      margin-bottom: 12px;
+    }
+    .creator-bio {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 16px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .creator-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .creator-tag {
+      padding: 4px 10px;
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .creator-stats {
+      display: flex;
+      gap: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+    }
+    .stat-item {
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+    .creator-actions {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 12px;
+    }
+    .creator-actions button {
+      flex: 1;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary { background: var(--xhs-red); color: white; }
+    .btn-secondary { background: var(--bg-secondary); color: var(--text-secondary); }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main-content { margin-left: 0; }
+      .creators-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="/admin/" class="sidebar-logo">
+        <div class="logo-icon">AI</div>
+        <span class="logo-text">小红书后台</span>
+      </a>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">概览</div>
+        <a href="/admin/" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          <span>仪表盘</span>
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">内容管理</div>
+        <a href="/admin/notes.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span>笔记管理</span>
+        </a>
+        <a href="/admin/suggestions.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span>建议管理</span>
+        </a>
+        <a href="/admin/creators.html" class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+          </svg>
+          <span>博主管理</span>
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">AI 生成</div>
+        <a href="/admin/generate.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          <span>AI 创作</span>
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">其他</div>
+        <a href="/" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+          <span>访问前台</span>
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <h1 class="topbar-title">博主管理</h1>
+    </div>
+
+    <div class="content">
+      <div class="creators-grid" id="creators-grid">
+        <!-- 博主卡片将动态插入 -->
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const coverGradients = [
+      'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+      'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+      'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+      'linear-gradient(135deg, #d299c2 0%, #fef9d7 100%)',
+      'linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)',
+    ]
+
+    const categoryName = {
+      'beauty': '美妆', 'fashion': '穿搭', 'food': '美食',
+      'travel': '旅行', 'home': '家居', 'fitness': '健身',
+      'tech': '数码', 'study': '学习'
+    }
+
+    async function loadCreators() {
+      try {
+        const res = await fetch('/api/creators')
+        const creators = await res.json()
+
+        // 获取每个博主的笔记数量
+        const creatorsWithStats = await Promise.all(creators.map(async (creator, index) => {
+          try {
+            const notesRes = await fetch(`/api/creators/${creator.id}/notes`)
+            const notes = await notesRes.json()
+            const totalLikes = notes.reduce((sum, n) => sum + (n.likes || 0), 0)
+            return { ...creator, noteCount: notes.length, totalLikes, gradient: coverGradients[index % coverGradients.length] }
+          } catch (e) {
+            return { ...creator, noteCount: 0, totalLikes: 0, gradient: coverGradients[index % coverGradients.length] }
+          }
+        }))
+
+        renderCreators(creatorsWithStats)
+      } catch (e) {
+        console.error('加载失败', e)
+      }
+    }
+
+    function renderCreators(creators) {
+      const container = document.getElementById('creators-grid')
+
+      container.innerHTML = creators.map(creator => `
+        <div class="creator-card">
+          <div class="creator-header" style="background: ${creator.gradient}"></div>
+          <img class="creator-avatar" src="${creator.avatar}" alt="">
+          <div class="creator-body">
+            <div class="creator-name">
+              ${escapeHtml(creator.name)}
+              <span class="ai-badge">AI</span>
+            </div>
+            <div class="creator-id">@AI_${creator.id}</div>
+            <div class="creator-bio">${escapeHtml(creator.bio || '')}</div>
+            <div class="creator-tags">
+              <span class="creator-tag">${categoryName[creator.category] || creator.category}</span>
+              ${(creator.style || []).slice(0, 2).map(s => `<span class="creator-tag">${s}</span>`).join('')}
+            </div>
+            <div class="creator-stats">
+              <div class="stat-item">
+                <div class="stat-value">${creator.noteCount}</div>
+                <div class="stat-label">笔记</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">${formatNumber(Math.floor(Math.random() * 50000 + 10000))}</div>
+                <div class="stat-label">粉丝</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">${formatNumber(creator.totalLikes)}</div>
+                <div class="stat-label">获赞</div>
+              </div>
+            </div>
+          </div>
+          <div class="creator-actions">
+            <button class="btn-primary" onclick="generateForCreator('${creator.id}')">AI 创作</button>
+            <button class="btn-secondary" onclick="viewCreator('${creator.id}')">查看主页</button>
+          </div>
+        </div>
+      `).join('')
+    }
+
+    function generateForCreator(id) {
+      location.href = `/admin/generate.html?creator=${id}`
+    }
+
+    function viewCreator(id) {
+      window.open(`/creator.html?id=${id}`, '_blank')
+    }
+
+    function formatNumber(num) {
+      if (num >= 10000) return (num / 10000).toFixed(1) + 'w'
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'k'
+      return num
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div')
+      div.textContent = text
+      return div.innerHTML
+    }
+
+    loadCreators()
+  </script>
+</body>
+</html>
