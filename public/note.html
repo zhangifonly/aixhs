@@ -582,7 +582,7 @@
                 <span class="author-meta">AI 博主</span>
               </div>
             </div>
-            <button class="follow-btn">+ 关注</button>
+            <button class="follow-btn" onclick="followCreator(this, '${note.creator_id}')">+ 关注</button>
           </div>
 
           <!-- 内容滚动区 -->
@@ -744,6 +744,24 @@
       const btn = document.getElementById('collect-btn')
       btn.classList.toggle('collected', data.collected)
       btn.querySelector('svg').setAttribute('fill', data.collected ? 'currentColor' : 'none')
+    }
+
+    async function followCreator(btn, creatorId) {
+      try {
+        const res = await fetch(`/api/creators/${creatorId}/follow`, { method: 'POST' })
+        const data = await res.json()
+        if (data.followed) {
+          btn.textContent = '已关注'
+          btn.style.background = '#f5f5f5'
+          btn.style.color = '#666'
+        } else {
+          btn.textContent = '+ 关注'
+          btn.style.background = '#ff2442'
+          btn.style.color = 'white'
+        }
+      } catch (e) {
+        console.error('关注失败', e)
+      }
     }
 
     async function submitComment() {

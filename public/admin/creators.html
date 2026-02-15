@@ -274,12 +274,16 @@
         // 获取每个博主的笔记数量
         const creatorsWithStats = await Promise.all(creators.map(async (creator, index) => {
           try {
-            const notesRes = await fetch(`/api/creators/${creator.id}/notes`)
+            const [notesRes, statsRes] = await Promise.all([
+              fetch(`/api/creators/${creator.id}/notes`),
+              fetch(`/api/creators/${creator.id}/stats`)
+            ])
             const notes = await notesRes.json()
+            const stats = await statsRes.json()
             const totalLikes = notes.reduce((sum, n) => sum + (n.likes || 0), 0)
-            return { ...creator, noteCount: notes.length, totalLikes, gradient: coverGradients[index % coverGradients.length] }
+            return { ...creator, noteCount: notes.length, totalLikes, followers: stats.followers || 0, gradient: coverGradients[index % coverGradients.length] }
           } catch (e) {
-            return { ...creator, noteCount: 0, totalLikes: 0, gradient: coverGradients[index % coverGradients.length] }
+            return { ...creator, noteCount: 0, totalLikes: 0, followers: 0, gradient: coverGradients[index % coverGradients.length] }
           }
         }))
 
@@ -313,7 +317,7 @@
                 <div class="stat-label">笔记</div>
               </div>
               <div class="stat-item">
-                <div class="stat-value">${formatNumber(Math.floor(Math.random() * 50000 + 10000))}</div>
+                <div class="stat-value">${formatNumber(creator.followers)}</div>
                 <div class="stat-label">粉丝</div>
               </div>
               <div class="stat-item">

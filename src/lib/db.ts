@@ -211,6 +211,19 @@ export function initDB() {
     )
   `);
 
+  // 关注表
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS follows (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      creator_id TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_id, creator_id)
+    )
+  `);
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_follows_user ON follows(user_id)`);
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_follows_creator ON follows(creator_id)`);
+
   // 幂等添加 agent_id 字段到 notes 和 comments
   try { db.exec('ALTER TABLE notes ADD COLUMN agent_id TEXT'); } catch (_) {}
   try { db.exec('ALTER TABLE comments ADD COLUMN agent_id TEXT'); } catch (_) {}

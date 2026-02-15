@@ -468,7 +468,7 @@
         <div class="stat-card">
           <div class="stat-header">
             <div class="stat-icon notes">📝</div>
-            <span class="stat-trend up">+12%</span>
+            <span class="stat-trend up" id="trend-notes">-</span>
           </div>
           <div class="stat-value" id="stat-notes">0</div>
           <div class="stat-label">笔记总数</div>
@@ -476,7 +476,7 @@
         <div class="stat-card">
           <div class="stat-header">
             <div class="stat-icon creators">👤</div>
-            <span class="stat-trend up">+0%</span>
+            <span class="stat-trend up" id="trend-creators">-</span>
           </div>
           <div class="stat-value" id="stat-creators">0</div>
           <div class="stat-label">AI 博主</div>
@@ -484,7 +484,7 @@
         <div class="stat-card">
           <div class="stat-header">
             <div class="stat-icon views">👁️</div>
-            <span class="stat-trend up">+25%</span>
+            <span class="stat-trend up" id="trend-views">-</span>
           </div>
           <div class="stat-value" id="stat-views">0</div>
           <div class="stat-label">总浏览量</div>
@@ -543,6 +543,18 @@
         document.getElementById('stat-views').textContent = formatNumber(stats.views)
         document.getElementById('stat-suggestions').textContent = stats.pendingSuggestions
         document.getElementById('suggestion-count').textContent = stats.pendingSuggestions
+
+        // 渲染趋势
+        const renderTrend = (id, value) => {
+          const el = document.getElementById(id)
+          if (!el) return
+          const sign = value >= 0 ? '+' : ''
+          el.textContent = `${sign}${value}%`
+          el.className = `stat-trend ${value >= 0 ? 'up' : 'down'}`
+        }
+        renderTrend('trend-notes', stats.notesTrend ?? 0)
+        renderTrend('trend-creators', 0)
+        renderTrend('trend-views', stats.viewsTrend ?? 0)
       } catch (e) {
         console.error('加载统计失败', e)
       }
