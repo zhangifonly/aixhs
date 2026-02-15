@@ -325,7 +325,7 @@
     </a>
     <span class="header-title" id="header-title"></span>
     <div class="header-right">
-      <div class="header-btn">
+      <div class="header-btn" onclick="shareCreator()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>
         </svg>
@@ -341,7 +341,7 @@
     <div class="avatar-section">
       <img class="avatar" id="avatar" src="" alt="">
       <div class="action-buttons">
-        <button class="message-btn">私信</button>
+        <button class="message-btn" onclick="shareCreator()">分享</button>
         <button class="follow-btn" id="follow-btn" onclick="toggleFollow()">关注</button>
       </div>
     </div>
@@ -449,13 +449,31 @@
         `<span class="profile-tag">${tag}</span>`
       ).join('')
 
-      // 设置统计数据（模拟）
-      const fans = Math.floor(Math.random() * 50000 + 10000)
-      const likes = Math.floor(Math.random() * 100000 + 20000)
-      document.getElementById('stat-fans').textContent = formatNumber(fans)
-      document.getElementById('stat-likes').textContent = formatNumber(likes)
-
       document.title = `${creator.name} - AI 小红薯`
+
+      // 加载真实统计数据
+      loadStats()
+    }
+
+    async function loadStats() {
+      try {
+        const res = await fetch(`/api/creators/${creatorId}/stats`)
+        const stats = await res.json()
+        document.getElementById('stat-fans').textContent = formatNumber(stats.followers)
+        document.getElementById('stat-likes').textContent = formatNumber(stats.total_likes)
+      } catch (e) {
+        document.getElementById('stat-fans').textContent = '0'
+        document.getElementById('stat-likes').textContent = '0'
+      }
+    }
+
+    function shareCreator() {
+      const url = window.location.href
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(() => alert('链接已复制到剪贴板')).catch(() => alert('复制失败'))
+      } else {
+        prompt('复制此链接分享：', url)
+      }
     }
 
     async function loadNotes() {
@@ -481,11 +499,20 @@
       container.innerHTML = notes.map((note, index) => {
         const gradient = coverGradients[index % coverGradients.length]
         const emoji = categoryEmoji[note.category] || '📝'
+        // 兜底：cover_image 为空时尝试从 images 取第一张
+        let coverSrc = note.cover_image
+        if (!coverSrc && note.images) {
+          try {
+            const imgs = typeof note.images === 'string' ? JSON.parse(note.images) : note.images
+            if (Array.isArray(imgs) && imgs.length > 0) coverSrc = imgs[0]
+          } catch {}
+        }
+        const coverHtml = coverSrc
+          ? `<img style="width:100%;aspect-ratio:3/4;object-fit:cover;" src="${coverSrc}" alt="" loading="lazy">`
+          : `<div class="note-cover" style="background: ${gradient}">${emoji}</div>`
         return `
           <a href="/note.html?id=${note.id}" class="note-card">
-            <div class="note-cover" style="background: ${gradient}">
-              ${emoji}
-            </div>
+            ${coverHtml}
             <div class="note-info">
               <div class="note-title">${escapeHtml(note.title)}</div>
               <div class="note-meta">
@@ -514,14 +541,21 @@
       return div.innerHTML
     }
 
-    function toggleFollow() {
+    async function toggleFollow() {
       const btn = document.getElementById('follow-btn')
-      if (btn.classList.contains('followed')) {
-        btn.classList.remove('followed')
-        btn.textContent = '关注'
-      } else {
-        btn.classList.add('followed')
-        btn.textContent = '已关注'
+      try {
+        const res = await fetch(`/api/creators/${creatorId}/follow`, { method: 'POST' })
+        const data = await res.json()
+        if (data.followed) {
+          btn.classList.add('followed')
+          btn.textContent = '已关注'
+        } else {
+          btn.classList.remove('followed')
+          btn.textContent = '关注'
+        }
+        document.getElementById('stat-fans').textContent = formatNumber(data.followers)
+      } catch (e) {
+        console.error('关注失败', e)
       }
     }
 
@@ -534,11 +568,99 @@
         const tabName = tab.dataset.tab
         if (tabName === 'notes') {
           renderNotes()
-        } else {
-          document.getElementById('notes-grid').innerHTML = '<div class="empty-state">暂无内容</div>'
+        } else if (tabName === 'collections') {
+          loadCollectedNotes()
+        } else if (tabName === 'likes') {
+          loadLikedNotes()
         }
       })
     })
+
+    async function loadCollectedNotes() {
+      const container = document.getElementById('notes-grid')
+      container.innerHTML = '<div class="loading-state">加载中...</div>'
+      try {
+        const res = await fetch(`/api/creators/${creatorId}/collected-notes`)
+        const data = await res.json()
+        if (data.length === 0) {
+          container.innerHTML = '<div class="empty-state">暂无被收藏的笔记</div>'
+          return
+        }
+        container.innerHTML = data.map((note, index) => {
+          const gradient = coverGradients[index % coverGradients.length]
+          const emoji = categoryEmoji[note.category] || '📝'
+          let coverSrc = note.cover_image
+          if (!coverSrc && note.images) {
+            try {
+              const imgs = typeof note.images === 'string' ? JSON.parse(note.images) : note.images
+              if (Array.isArray(imgs) && imgs.length > 0) coverSrc = imgs[0]
+            } catch {}
+          }
+          const coverHtml = coverSrc
+            ? `<img style="width:100%;aspect-ratio:3/4;object-fit:cover;" src="${coverSrc}" alt="" loading="lazy">`
+            : `<div class="note-cover" style="background: ${gradient}">${emoji}</div>`
+          return `
+            <a href="/note.html?id=${note.id}" class="note-card">
+              ${coverHtml}
+              <div class="note-info">
+                <div class="note-title">${escapeHtml(note.title)}</div>
+                <div class="note-meta">
+                  <span class="note-likes">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                    ${formatNumber(note.collects)}
+                  </span>
+                </div>
+              </div>
+            </a>
+          `
+        }).join('')
+      } catch (e) {
+        container.innerHTML = '<div class="empty-state">加载失败</div>'
+      }
+    }
+
+    async function loadLikedNotes() {
+      const container = document.getElementById('notes-grid')
+      container.innerHTML = '<div class="loading-state">加载中...</div>'
+      try {
+        const res = await fetch(`/api/creators/${creatorId}/liked-notes`)
+        const data = await res.json()
+        if (data.length === 0) {
+          container.innerHTML = '<div class="empty-state">暂无被点赞的笔记</div>'
+          return
+        }
+        container.innerHTML = data.map((note, index) => {
+          const gradient = coverGradients[index % coverGradients.length]
+          const emoji = categoryEmoji[note.category] || '📝'
+          let coverSrc = note.cover_image
+          if (!coverSrc && note.images) {
+            try {
+              const imgs = typeof note.images === 'string' ? JSON.parse(note.images) : note.images
+              if (Array.isArray(imgs) && imgs.length > 0) coverSrc = imgs[0]
+            } catch {}
+          }
+          const coverHtml = coverSrc
+            ? `<img style="width:100%;aspect-ratio:3/4;object-fit:cover;" src="${coverSrc}" alt="" loading="lazy">`
+            : `<div class="note-cover" style="background: ${gradient}">${emoji}</div>`
+          return `
+            <a href="/note.html?id=${note.id}" class="note-card">
+              ${coverHtml}
+              <div class="note-info">
+                <div class="note-title">${escapeHtml(note.title)}</div>
+                <div class="note-meta">
+                  <span class="note-likes">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    ${formatNumber(note.likes)}
+                  </span>
+                </div>
+              </div>
+            </a>
+          `
+        }).join('')
+      } catch (e) {
+        container.innerHTML = '<div class="empty-state">加载失败</div>'
+      }
+    }
 
     // 滚动监听
     window.addEventListener('scroll', () => {

@@ -80,7 +80,12 @@ api.get('/categories', (c) => {
 
 // 获取博主列表
 api.get('/creators', (c) => {
-  const creators = getAllCreators()
+  const creators = db.prepare(`
+    SELECT c.*, COALESCE(n.cnt, 0) as notes_count
+    FROM creators c
+    LEFT JOIN (SELECT creator_id, COUNT(*) as cnt FROM notes GROUP BY creator_id) n
+    ON c.id = n.creator_id
+  `).all()
   return c.json(creators)
 })
 
@@ -89,6 +94,69 @@ api.get('/creators/:id', (c) => {
   const creator = getCreator(c.req.param('id'))
   if (!creator) return c.json({ error: '博主不存在' }, 404)
   return c.json(creator)
+})
+
+// 关注/取消关注博主
+api.post('/creators/:id/follow', async (c) => {
+  const creatorId = c.req.param('id')
+  const { userId } = await c.req.json().catch(() => ({ userId: null }))
+  const finalUserId = userId || `anon_${Date.now()}`
+
+  const existing = db.prepare(
+    'SELECT id FROM follows WHERE user_id = ? AND creator_id = ?'
+  ).get(finalUserId, creatorId)
+
+  if (existing) {
+    db.prepare('DELETE FROM follows WHERE user_id = ? AND creator_id = ?').run(finalUserId, creatorId)
+    const count = (db.prepare('SELECT COUNT(*) as cnt FROM follows WHERE creator_id = ?').get(creatorId) as any).cnt
+    return c.json({ followed: false, followers: count })
+  } else {
+    db.prepare('INSERT INTO follows (id, user_id, creator_id) VALUES (?, ?, ?)').run(generateId(), finalUserId, creatorId)
+    const count = (db.prepare('SELECT COUNT(*) as cnt FROM follows WHERE creator_id = ?').get(creatorId) as any).cnt
+    return c.json({ followed: true, followers: count })
+  }
+})
+
+// 获取博主统计数据（粉丝数、获赞与收藏）
+api.get('/creators/:id/stats', (c) => {
+  const creatorId = c.req.param('id')
+  const followers = (db.prepare('SELECT COUNT(*) as cnt FROM follows WHERE creator_id = ?').get(creatorId) as any).cnt
+  const stats = db.prepare(`
+    SELECT COALESCE(SUM(likes), 0) as total_likes, COALESCE(SUM(collects), 0) as total_collects,
+           COUNT(*) as notes_count
+    FROM notes WHERE creator_id = ? AND status = 'published'
+  `).get(creatorId) as any
+  return c.json({
+    followers,
+    total_likes: stats.total_likes + stats.total_collects,
+    notes_count: stats.notes_count
+  })
+})
+
+// 获取博主被收藏的笔记（收藏标签页）
+api.get('/creators/:id/collected-notes', (c) => {
+  const creatorId = c.req.param('id')
+  const notes = db.prepare(`
+    SELECT n.*, c.name as creator_name, c.avatar as creator_avatar
+    FROM notes n
+    JOIN creators c ON n.creator_id = c.id
+    WHERE n.creator_id = ? AND n.status = 'published' AND n.collects > 0
+    ORDER BY n.collects DESC
+  `).all(creatorId)
+  return c.json(notes)
+})
+
+// 获取博主被点赞的笔记（赞过标签页）
+api.get('/creators/:id/liked-notes', (c) => {
+  const creatorId = c.req.param('id')
+  const notes = db.prepare(`
+    SELECT n.*, c.name as creator_name, c.avatar as creator_avatar
+    FROM notes n
+    JOIN creators c ON n.creator_id = c.id
+    WHERE n.creator_id = ? AND n.status = 'published' AND n.likes > 0
+    ORDER BY n.likes DESC
+  `).all(creatorId)
+  return c.json(notes)
 })
 
 // 获取博主的笔记列表
@@ -338,11 +406,21 @@ api.get('/admin/stats', (c) => {
   const suggestionCount = db.prepare('SELECT COUNT(*) as count FROM suggestions WHERE status = ?').get('pending') as any
   const creators = getAllCreators()
 
+  // 计算7天趋势
+  const notesRecent = (db.prepare("SELECT COUNT(*) as cnt FROM notes WHERE status='published' AND created_at >= datetime('now', '-7 days')").get() as any)?.cnt || 0
+  const notesPrev = (db.prepare("SELECT COUNT(*) as cnt FROM notes WHERE status='published' AND created_at >= datetime('now', '-14 days') AND created_at < datetime('now', '-7 days')").get() as any)?.cnt || 0
+  const viewsRecent = (db.prepare("SELECT SUM(views) as total FROM notes WHERE created_at >= datetime('now', '-7 days')").get() as any)?.total || 0
+  const viewsPrev = (db.prepare("SELECT SUM(views) as total FROM notes WHERE created_at >= datetime('now', '-14 days') AND created_at < datetime('now', '-7 days')").get() as any)?.total || 0
+
+  const calcTrend = (recent: number, prev: number) => prev === 0 ? (recent > 0 ? 100 : 0) : Math.round((recent - prev) / prev * 100)
+
   return c.json({
     notes: noteCount?.count || 0,
     creators: creators.length,
     views: viewsResult?.total || 0,
-    pendingSuggestions: suggestionCount?.count || 0
+    pendingSuggestions: suggestionCount?.count || 0,
+    notesTrend: calcTrend(notesRecent, notesPrev),
+    viewsTrend: calcTrend(viewsRecent, viewsPrev)
   })
 })
 
@@ -432,6 +510,94 @@ api.post('/admin/seed', (c) => {
   }
 
   return c.json({ message: '示例笔记添加成功', count: sampleNotes.length })
+})
+
+// ========== 批量修复缺失封面图 ==========
+
+// 按分类随机分配已有封面图给无封面笔记
+api.post('/admin/fix-missing-covers', (c) => {
+  // 1. 查询所有无封面的已发布笔记（按分类分组）
+  const notesWithoutCover = db.prepare(`
+    SELECT id, category, images FROM notes
+    WHERE status = 'published' AND (cover_image IS NULL OR cover_image = '')
+  `).all() as { id: string; category: string; images: string | null }[]
+
+  if (notesWithoutCover.length === 0) {
+    return c.json({ message: '所有笔记都已有封面图', fixed: 0 })
+  }
+
+  // 2. 按分类分组
+  const byCategory: Record<string, typeof notesWithoutCover> = {}
+  for (const note of notesWithoutCover) {
+    const cat = note.category || 'unknown'
+    if (!byCategory[cat]) byCategory[cat] = []
+    byCategory[cat].push(note)
+  }
+
+  // 3. 查询每个分类已有的 cover_image 列表
+  const coverPool: Record<string, string[]> = {}
+  for (const cat of Object.keys(byCategory)) {
+    const covers = db.prepare(`
+      SELECT DISTINCT cover_image FROM notes
+      WHERE status = 'published' AND category = ? AND cover_image IS NOT NULL AND cover_image != ''
+    `).all(cat) as { cover_image: string }[]
+    coverPool[cat] = covers.map(r => r.cover_image)
+  }
+
+  // 4. 全局封面池（兜底用）
+  const globalCovers = db.prepare(`
+    SELECT DISTINCT cover_image FROM notes
+    WHERE status = 'published' AND cover_image IS NOT NULL AND cover_image != ''
+    LIMIT 200
+  `).all() as { cover_image: string }[]
+  const globalPool = globalCovers.map(r => r.cover_image)
+
+  // 5. 批量更新
+  const updateStmt = db.prepare('UPDATE notes SET cover_image = ? WHERE id = ?')
+  let fixed = 0
+  let fromImages = 0
+  const categoryStats: Record<string, number> = {}
+
+  const updateMany = db.transaction(() => {
+    for (const note of notesWithoutCover) {
+      const cat = note.category || 'unknown'
+      let pool = coverPool[cat] || []
+
+      // 优先从同分类池中随机选
+      let chosen: string | null = null
+      if (pool.length > 0) {
+        chosen = pool[Math.floor(Math.random() * pool.length)]
+      } else if (globalPool.length > 0) {
+        // 兜底：从全局池中选
+        chosen = globalPool[Math.floor(Math.random() * globalPool.length)]
+      } else if (note.images) {
+        // 最后兜底：从 images 字段取第一张
+        try {
+          const imgs = JSON.parse(note.images)
+          if (Array.isArray(imgs) && imgs.length > 0) {
+            chosen = imgs[0]
+            fromImages++
+          }
+        } catch {}
+      }
+
+      if (chosen) {
+        updateStmt.run(chosen, note.id)
+        fixed++
+        categoryStats[cat] = (categoryStats[cat] || 0) + 1
+      }
+    }
+  })
+
+  updateMany()
+
+  return c.json({
+    message: `修复完成`,
+    total_missing: notesWithoutCover.length,
+    fixed,
+    from_images: fromImages,
+    category_stats: categoryStats
+  })
 })
 
 // ========== ComfyUI 图片生成 API ==========

@@ -434,21 +434,37 @@
     const clearBtn = document.getElementById('clear-btn')
     let searchHistory = JSON.parse(localStorage.getItem('searchHistory') || '[]')
 
-    const hotSearches = [
-      '冬季护肤', '穿搭灵感', '减脂食谱', '旅行攻略',
-      '租房改造', '健身计划', '数码测评', '考研经验'
-    ]
+    let hotSearches = []
+    let hotList = []
 
-    const hotList = [
-      { title: '冬季护肤必备好物', badge: 'hot', heat: 128000 },
-      { title: '新年穿搭灵感', badge: 'new', heat: 96000 },
-      { title: '一人食也要好好吃', badge: '', heat: 85000 },
-      { title: '小众旅行目的地', badge: '', heat: 72000 },
-      { title: '低成本租房改造', badge: '', heat: 68000 },
-      { title: '帕梅拉暴汗计划', badge: 'hot', heat: 62000 },
-      { title: 'iPhone 使用技巧', badge: '', heat: 58000 },
-      { title: '高效学习方法', badge: '', heat: 52000 },
-    ]
+    async function loadHotData() {
+      try {
+        const res = await fetch('/api/hot-topics?limit=8')
+        const topics = await res.json()
+        if (topics.length > 0) {
+          hotSearches = topics.map(t => t.title.slice(0, 6))
+          hotList = topics.map((t, i) => ({
+            title: t.title,
+            badge: i === 0 ? 'hot' : (i === 1 ? 'new' : ''),
+            heat: t.heat_score || Math.max(50000, 130000 - i * 10000)
+          }))
+        } else {
+          // fallback: 从热门笔记取标题
+          const feedRes = await fetch('/api/feed?limit=8')
+          const notes = await feedRes.json()
+          hotSearches = notes.map(n => n.title.slice(0, 6))
+          hotList = notes.map((n, i) => ({
+            title: n.title,
+            badge: i === 0 ? 'hot' : '',
+            heat: n.likes || 1000
+          }))
+        }
+      } catch (e) {
+        console.error('加载热搜失败', e)
+      }
+      renderHotSearches()
+      renderHotList()
+    }
 
     const coverGradients = [
       'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -474,8 +490,7 @@
       }
 
       renderHistory()
-      renderHotSearches()
-      renderHotList()
+      loadHotData()
 
       // 监听输入
       searchInput.addEventListener('input', () => {
@@ -608,7 +623,7 @@
                 <div class="creator-name">${highlightText(creator.name, query)}</div>
                 <div class="creator-bio">${escapeHtml(creator.bio || '')}</div>
               </div>
-              <button class="creator-follow-btn" onclick="event.preventDefault();event.stopPropagation();">关注</button>
+              <button class="creator-follow-btn" onclick="event.preventDefault();event.stopPropagation();followCreator(this, '${creator.id}')">关注</button>
             </a>
           `).join('')
           html += '</div>'
@@ -640,7 +655,7 @@
               <div class="creator-name">${highlightText(creator.name, query)}</div>
               <div class="creator-bio">${escapeHtml(creator.bio || '')}</div>
             </div>
-            <button class="creator-follow-btn" onclick="event.preventDefault();event.stopPropagation();">关注</button>
+            <button class="creator-follow-btn" onclick="event.preventDefault();event.stopPropagation();followCreator(this, '${creator.id}')">关注</button>
           </a>
         `).join('') + '</div>'
       }
@@ -651,11 +666,20 @@
       return notes.map((note, index) => {
         const gradient = coverGradients[index % coverGradients.length]
         const emoji = categoryEmoji[note.category] || '📝'
+        // 兜底：cover_image 为空时尝试从 images 取第一张
+        let coverSrc = note.cover_image
+        if (!coverSrc && note.images) {
+          try {
+            const imgs = typeof note.images === 'string' ? JSON.parse(note.images) : note.images
+            if (Array.isArray(imgs) && imgs.length > 0) coverSrc = imgs[0]
+          } catch {}
+        }
+        const coverHtml = coverSrc
+          ? `<img style="width:100%;aspect-ratio:3/4;object-fit:cover;" src="${coverSrc}" alt="" loading="lazy">`
+          : `<div class="note-cover" style="background: ${gradient}">${emoji}</div>`
         return `
           <a href="/note.html?id=${note.id}" class="note-card">
-            <div class="note-cover" style="background: ${gradient}">
-              ${emoji}
-            </div>
+            ${coverHtml}
             <div class="note-info">
               <div class="note-title">${highlightText(note.title, query)}</div>
               <div class="note-author">
@@ -721,6 +745,24 @@
       const div = document.createElement('div')
       div.textContent = text
       return div.innerHTML
+    }
+
+    async function followCreator(btn, creatorId) {
+      try {
+        const res = await fetch(`/api/creators/${creatorId}/follow`, { method: 'POST' })
+        const data = await res.json()
+        if (data.followed) {
+          btn.textContent = '已关注'
+          btn.style.background = '#f5f5f5'
+          btn.style.color = '#666'
+        } else {
+          btn.textContent = '关注'
+          btn.style.background = '#ff2442'
+          btn.style.color = 'white'
+        }
+      } catch (e) {
+        console.error('关注失败', e)
+      }
     }
 
     init()

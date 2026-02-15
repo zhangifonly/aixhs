@@ -428,7 +428,7 @@
     <div class="section">
       <div class="section-header">
         <span class="section-title">🔥 热门话题</span>
-        <a href="#" class="section-more">
+        <a href="/search.html" class="section-more">
           查看更多
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="9 18 15 12 9 6"/>
@@ -442,7 +442,7 @@
     <div class="section">
       <div class="section-header">
         <span class="section-title">✨ 推荐博主</span>
-        <a href="#" class="section-more">
+        <a href="/search.html" class="section-more">
           查看更多
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="9 18 15 12 9 6"/>
@@ -484,13 +484,13 @@
       </svg>
       <span></span>
     </a>
-    <a href="#" class="nav-item">
+    <a href="/discover.html" class="nav-item">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
       </svg>
       <span>消息</span>
     </a>
-    <a href="#" class="nav-item">
+    <a href="/admin/" class="nav-item">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
         <circle cx="12" cy="7" r="4"/>
@@ -513,13 +513,29 @@
       { id: 'more', name: '更多', icon: '•••', color: '#f0f0f0' },
     ]
 
-    const hotTopics = [
-      { title: '冬季护肤必备好物分享', heat: 128000, category: 'beauty' },
-      { title: '2024穿搭灵感合集', heat: 96000, category: 'fashion' },
-      { title: '一人食也要好好吃饭', heat: 85000, category: 'food' },
-      { title: '小众旅行目的地推荐', heat: 72000, category: 'travel' },
-      { title: '租房改造低成本方案', heat: 68000, category: 'home' },
-    ]
+    const hotTopics = []
+
+    // 从 API 加载热门话题
+    async function loadHotTopics() {
+      try {
+        const res = await fetch('/api/hot-topics?limit=5')
+        const topics = await res.json()
+        if (topics.length > 0) {
+          hotTopics.push(...topics.map(t => ({ title: t.title, heat: t.heat_score || 10000, category: t.category || '' })))
+        }
+      } catch (e) {
+        console.error('加载热门话题失败', e)
+      }
+      if (hotTopics.length === 0) {
+        // 如果 API 没有数据，用热门笔记标题代替
+        try {
+          const res = await fetch('/api/feed?limit=5')
+          const notes = await res.json()
+          hotTopics.push(...notes.map(n => ({ title: n.title, heat: n.views || n.likes * 10, category: n.category })))
+        } catch (e) {}
+      }
+      renderTopics()
+    }
 
     const coverGradients = [
       'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -591,8 +607,8 @@
           <img class="creator-avatar" src="${creator.avatar}" alt="">
           <span class="creator-name">${creator.name}</span>
           <span class="creator-category">${categoryEmoji[creator.category] || '📝'} ${getCategoryName(creator.category)}</span>
-          <span class="creator-stats">${Math.floor(Math.random() * 50 + 10)}篇笔记</span>
-          <button class="follow-btn" onclick="event.preventDefault();toggleFollow(this)">关注</button>
+          <span class="creator-stats">${creator.notes_count || 0}篇笔记</span>
+          <button class="follow-btn" onclick="event.preventDefault();followCreator(this, '${creator.id}')">关注</button>
         </a>
       `).join('')
     }
@@ -614,11 +630,20 @@
       container.innerHTML = notes.map((note, index) => {
         const gradient = coverGradients[index % coverGradients.length]
         const emoji = categoryEmoji[note.category] || '📝'
+        // 兜底：cover_image 为空时尝试从 images 取第一张
+        let coverSrc = note.cover_image
+        if (!coverSrc && note.images) {
+          try {
+            const imgs = typeof note.images === 'string' ? JSON.parse(note.images) : note.images
+            if (Array.isArray(imgs) && imgs.length > 0) coverSrc = imgs[0]
+          } catch {}
+        }
+        const coverHtml = coverSrc
+          ? `<img style="width:100%;aspect-ratio:1/1;object-fit:cover;" src="${coverSrc}" alt="" loading="lazy">`
+          : `<div class="featured-cover" style="background: ${gradient}">${emoji}</div>`
         return `
           <a href="/note.html?id=${note.id}" class="featured-card">
-            <div class="featured-cover" style="background: ${gradient}">
-              ${emoji}
-            </div>
+            ${coverHtml}
             <div class="featured-info">
               <div class="featured-title">${escapeHtml(note.title)}</div>
               <div class="featured-author">
@@ -658,13 +683,19 @@
       return div.innerHTML
     }
 
-    function toggleFollow(btn) {
-      if (btn.classList.contains('followed')) {
-        btn.classList.remove('followed')
-        btn.textContent = '关注'
-      } else {
-        btn.classList.add('followed')
-        btn.textContent = '已关注'
+    async function followCreator(btn, creatorId) {
+      try {
+        const res = await fetch(`/api/creators/${creatorId}/follow`, { method: 'POST' })
+        const data = await res.json()
+        if (data.followed) {
+          btn.classList.add('followed')
+          btn.textContent = '已关注'
+        } else {
+          btn.classList.remove('followed')
+          btn.textContent = '关注'
+        }
+      } catch (e) {
+        console.error('关注失败', e)
       }
     }
 
@@ -695,7 +726,7 @@
 
     // 初始化
     renderCategories()
-    renderTopics()
+    loadHotTopics()
     loadCreators()
     loadFeatured()
   </script>
