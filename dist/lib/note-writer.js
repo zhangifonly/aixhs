@@ -9,14 +9,9 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { buildSmartPrompt, getRelevantReferences, getExampleTitles, getSeasonalSuggestions } from './prompt-builder.js';
 import { matchCategory, matchSubTopic, getCategoryProfile, getSubTopics, getAllCategories, getCurrentSeason } from './topic-matcher.js';
+import { CLAUDE_API } from './api-config.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-// API 配置
-const API_CONFIG = {
-    apiKey: 'sk-5RrW7Av0blv4KUCN4GUcksk3XohCf4u35s7bWgesLHY8n1VI',
-    baseURL: 'https://zjz-ai.webtrn.cn',
-    model: 'claude-sonnet-4-5-20250929'
-};
 // 加载博主配置
 export function loadCreators() {
     const path = join(__dirname, '../../data/creators.json');
@@ -60,10 +55,12 @@ export async function* generateNoteStream(creatorId, topic, options) {
         maxReferences: 2
     });
     const messages = [
-        { role: 'user', content: `请写一篇关于「${topic}」的小红书笔记` }
+        { role: 'user', content: `请写一篇关于「${topic}」的小红薯笔记` }
     ];
     const stream = createChatStream(messages, {
-        ...API_CONFIG,
+        apiKey: CLAUDE_API.apiKey,
+        baseURL: CLAUDE_API.baseURL,
+        model: CLAUDE_API.model,
         systemPrompt,
         maxTokens: 2048,
     });

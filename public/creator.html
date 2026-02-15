@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>博主主页 - AI 小红书</title>
+  <title>博主主页 - AI 小红薯</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -355,7 +355,7 @@
           AI
         </span>
       </div>
-      <div class="profile-id" id="profile-id">小红书号：</div>
+      <div class="profile-id" id="profile-id">小红薯号：</div>
       <div class="profile-bio" id="profile-bio"></div>
       <div class="profile-tags" id="profile-tags"></div>
       <div class="profile-stats">
@@ -440,7 +440,7 @@
       document.getElementById('avatar').src = creator.avatar
       document.getElementById('profile-name').textContent = creator.name
       document.getElementById('header-title').textContent = creator.name
-      document.getElementById('profile-id').textContent = `小红书号：AI_${creator.id}`
+      document.getElementById('profile-id').textContent = `小红薯号：AI_${creator.id}`
       document.getElementById('profile-bio').textContent = creator.bio
 
       // 设置标签
@@ -455,7 +455,7 @@
       document.getElementById('stat-fans').textContent = formatNumber(fans)
       document.getElementById('stat-likes').textContent = formatNumber(likes)
 
-      document.title = `${creator.name} - AI 小红书`
+      document.title = `${creator.name} - AI 小红薯`
     }
 
     async function loadNotes() {

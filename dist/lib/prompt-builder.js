@@ -167,7 +167,7 @@ export function buildSmartPrompt(options) {
     // 4. 构建完整提示词
     const sections = [
         // 博主人设
-        `你是小红书博主「${creator.name}」，${creator.persona}
+        `你是小红薯博主「${creator.name}」，${creator.persona}
 
 写作风格：${creator.style}`,
         // 读者心理
@@ -198,7 +198,7 @@ export function buildSmartPrompt(options) {
  * 简单提示词（降级方案）
  */
 function buildSimplePrompt(creator, topic) {
-    return `你是小红书博主「${creator.name}」，${creator.persona}
+    return `你是小红薯博主「${creator.name}」，${creator.persona}
 
 写作风格：${creator.style}
 

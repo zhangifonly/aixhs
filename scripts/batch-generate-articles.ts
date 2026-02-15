@@ -1,12 +1,12 @@
 /**
  * 批量生成文章脚本
- * 基于真实小红书热门话题，为8个栏目各生成10+篇文章
+ * 基于真实小红薯热门话题，为8个栏目各生成10+篇文章
  */
 
 import { db, generateId } from '../src/lib/db.js'
 import { generateNoteStream, parseNoteContent, saveNote } from '../src/lib/note-writer.js'
 
-// 8个栏目的文章策划（基于小红书真实热门话题）
+// 8个栏目的文章策划（基于小红薯真实热门话题）
 const articlePlans: Record<string, { creatorId: string; topics: string[] }> = {
   // 美妆护肤 - 博主：小美酱
   beauty: {
@@ -214,7 +214,7 @@ async function generateArticle(creatorId: string, topic: string, categoryId: str
 // 主函数
 async function main() {
   console.log('=== 批量生成文章 ===\n')
-  console.log('基于小红书真实热门话题，为8个栏目生成内容\n')
+  console.log('基于小红薯真实热门话题，为8个栏目生成内容\n')
 
   const stats = {
     total: 0,

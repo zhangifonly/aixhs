@@ -14,7 +14,7 @@ export const CLAUDE_API = {
 export const COMFYUI_CONFIG = {
   host: process.env.COMFYUI_HOST || '192.168.193.188',
   port: parseInt(process.env.COMFYUI_PORT || '8188'),
-  timeout: parseInt(process.env.COMFYUI_TIMEOUT || '120000')
+  timeout: parseInt(process.env.COMFYUI_TIMEOUT || '300000') // 5分钟超时
 }
 
 export const COMFYUI_URL = `http://${COMFYUI_CONFIG.host}:${COMFYUI_CONFIG.port}`

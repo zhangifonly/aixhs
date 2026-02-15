@@ -1,7 +1,7 @@
 {
   "name": "aixhs",
   "version": "1.0.0",
-  "description": "AI 小红书 - AI 驱动的内容创作平台",
+  "description": "AI 小红薯 - AI 驱动的内容创作平台",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",

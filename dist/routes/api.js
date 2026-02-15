@@ -6,6 +6,10 @@ import { streamSSE } from 'hono/streaming';
 import { db, generateId } from '../lib/db.js';
 import { getAllCreators, getCreator, generateNoteStream, getCategoryProfile, getSubTopics, getTopicSuggestions, getRelevantReferences, getCurrentSeason } from '../lib/note-writer.js';
 import { generateImage, checkComfyUIHealth, buildImagePrompt } from '../lib/comfyui.js';
+import { addAIComments, batchAddComments, clearAIComments } from '../lib/ai-comments.js';
+import { crawlHotTopics, getHotTopics, getHotTopic, getHotTopicStats, cleanExpiredTopics } from '../lib/hot-topic-crawler.js';
+import { generateNoteForTopic, processPendingTopics, getAutoGenerateStats } from '../lib/auto-generator.js';
+import { getSchedulerStatus, triggerTask, getAvailableTasks } from '../lib/scheduler.js';
 const api = new Hono();
 // 获取分类列表
 api.get('/categories', (c) => {
@@ -19,6 +23,23 @@ api.get('/categories', (c) => {
         { id: 'fitness', name: '健身运动', icon: '💪' },
         { id: 'tech', name: '数码科技', icon: '📱' },
         { id: 'study', name: '学习成长', icon: '📚' },
+        { id: 'movie', name: '影视', icon: '🎬' },
+        { id: 'career', name: '职场', icon: '💼' },
+        { id: 'emotion', name: '情感', icon: '💕' },
+        { id: 'baby', name: '母婴', icon: '👶' },
+        { id: 'pet', name: '萌宠', icon: '🐱' },
+        { id: 'music', name: '音乐', icon: '🎵' },
+        { id: 'dance', name: '舞蹈', icon: '💃' },
+        { id: 'photo', name: '摄影', icon: '📷' },
+        { id: 'game', name: '游戏', icon: '🎮' },
+        { id: 'wellness', name: '中式养生', icon: '🍵' },
+        { id: 'mental', name: '心理健康', icon: '🧠' },
+        { id: 'finance', name: '理财生活', icon: '💰' },
+        { id: 'car', name: '汽车出行', icon: '🚗' },
+        { id: 'outdoor', name: '户外运动', icon: '⛰️' },
+        { id: 'handmade', name: '手工DIY', icon: '🎨' },
+        { id: 'culture', name: '新中式文化', icon: '🏮' },
+        { id: 'ai', name: 'AI玩法', icon: '🤖' },
     ];
     return c.json(categories);
 });
@@ -80,19 +101,53 @@ api.get('/notes/:id', (c) => {
     db.prepare('UPDATE notes SET views = views + 1 WHERE id = ?').run(c.req.param('id'));
     return c.json(note);
 });
-// 点赞笔记
-api.post('/notes/:id/like', (c) => {
+// 点赞笔记（防重复）
+api.post('/notes/:id/like', async (c) => {
     const noteId = c.req.param('id');
-    db.prepare('UPDATE notes SET likes = likes + 1 WHERE id = ?').run(noteId);
-    const note = db.prepare('SELECT likes FROM notes WHERE id = ?').get(noteId);
-    return c.json({ likes: note?.likes || 0 });
+    const { userId } = await c.req.json().catch(() => ({ userId: null }));
+    const finalUserId = userId || `anon_${Date.now()}`;
+    // 检查是否已点赞
+    const existing = db.prepare('SELECT id FROM interactions WHERE user_id = ? AND note_id = ? AND type = ?').get(finalUserId, noteId, 'like');
+    if (existing) {
+        // 取消点赞
+        db.prepare('DELETE FROM interactions WHERE user_id = ? AND note_id = ? AND type = ?')
+            .run(finalUserId, noteId, 'like');
+        db.prepare('UPDATE notes SET likes = MAX(0, likes - 1) WHERE id = ?').run(noteId);
+        const note = db.prepare('SELECT likes FROM notes WHERE id = ?').get(noteId);
+        return c.json({ likes: note?.likes || 0, liked: false });
+    }
+    else {
+        // 添加点赞
+        db.prepare('INSERT INTO interactions (id, user_id, note_id, type) VALUES (?, ?, ?, ?)')
+            .run(generateId(), finalUserId, noteId, 'like');
+        db.prepare('UPDATE notes SET likes = likes + 1 WHERE id = ?').run(noteId);
+        const note = db.prepare('SELECT likes FROM notes WHERE id = ?').get(noteId);
+        return c.json({ likes: note?.likes || 0, liked: true });
+    }
 });
-// 收藏笔记
-api.post('/notes/:id/collect', (c) => {
+// 收藏笔记（防重复）
+api.post('/notes/:id/collect', async (c) => {
     const noteId = c.req.param('id');
-    db.prepare('UPDATE notes SET collects = collects + 1 WHERE id = ?').run(noteId);
-    const note = db.prepare('SELECT collects FROM notes WHERE id = ?').get(noteId);
-    return c.json({ collects: note?.collects || 0 });
+    const { userId } = await c.req.json().catch(() => ({ userId: null }));
+    const finalUserId = userId || `anon_${Date.now()}`;
+    // 检查是否已收藏
+    const existing = db.prepare('SELECT id FROM interactions WHERE user_id = ? AND note_id = ? AND type = ?').get(finalUserId, noteId, 'collect');
+    if (existing) {
+        // 取消收藏
+        db.prepare('DELETE FROM interactions WHERE user_id = ? AND note_id = ? AND type = ?')
+            .run(finalUserId, noteId, 'collect');
+        db.prepare('UPDATE notes SET collects = MAX(0, collects - 1) WHERE id = ?').run(noteId);
+        const note = db.prepare('SELECT collects FROM notes WHERE id = ?').get(noteId);
+        return c.json({ collects: note?.collects || 0, collected: false });
+    }
+    else {
+        // 添加收藏
+        db.prepare('INSERT INTO interactions (id, user_id, note_id, type) VALUES (?, ?, ?, ?)')
+            .run(generateId(), finalUserId, noteId, 'collect');
+        db.prepare('UPDATE notes SET collects = collects + 1 WHERE id = ?').run(noteId);
+        const note = db.prepare('SELECT collects FROM notes WHERE id = ?').get(noteId);
+        return c.json({ collects: note?.collects || 0, collected: true });
+    }
 });
 // 获取笔记评论
 api.get('/notes/:id/comments', (c) => {
@@ -301,11 +356,11 @@ api.get('/comfyui/health', async (c) => {
 });
 // 生成图片
 api.post('/comfyui/generate', async (c) => {
-    const { title, category, content } = await c.req.json();
+    const { title, category, imageType } = await c.req.json();
     if (!title) {
         return c.json({ error: '缺少标题参数' }, 400);
     }
-    const result = await generateImage(title, category || 'beauty', content);
+    const result = await generateImage(title, category || 'beauty', imageType || 'cover');
     if (result.success) {
         return c.json({
             success: true,
@@ -325,13 +380,204 @@ api.post('/comfyui/preview-prompt', async (c) => {
     const prompt = buildImagePrompt(title || '测试', category || 'beauty');
     return c.json({ prompt });
 });
+// 批量为没有封面图的笔记生成图片
+api.post('/comfyui/batch-generate', async (c) => {
+    const { limit = 10 } = await c.req.json().catch(() => ({}));
+    // 检查 ComfyUI 是否可用
+    const isHealthy = await checkComfyUIHealth();
+    if (!isHealthy) {
+        return c.json({ error: 'ComfyUI 服务不可用' }, 503);
+    }
+    // 获取没有封面图的笔记
+    const notes = db.prepare(`
+    SELECT id, title, category FROM notes
+    WHERE cover_image IS NULL
+    ORDER BY created_at DESC
+    LIMIT ?
+  `).all(limit);
+    if (notes.length === 0) {
+        return c.json({ message: '所有笔记都已有封面图', processed: 0 });
+    }
+    // 异步批量生成（不阻塞响应）
+    const processNotes = async () => {
+        let success = 0;
+        let failed = 0;
+        for (const note of notes) {
+            try {
+                console.log(`[批量补图] 处理: ${note.title}`);
+                const result = await generateImage(note.title, note.category || 'beauty', 'cover');
+                if (result.success && result.imageUrl) {
+                    db.prepare('UPDATE notes SET cover_image = ? WHERE id = ?').run(result.imageUrl, note.id);
+                    console.log(`[批量补图] 成功: ${note.id} -> ${result.imageUrl}`);
+                    success++;
+                }
+                else {
+                    console.log(`[批量补图] 失败: ${note.id} - ${result.error}`);
+                    failed++;
+                }
+            }
+            catch (err) {
+                console.error(`[批量补图] 错误: ${note.id} - ${err.message}`);
+                failed++;
+            }
+            // 间隔 1 秒避免请求过快
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+        console.log(`[批量补图] 完成: 成功 ${success}, 失败 ${failed}`);
+    };
+    // 启动异步处理
+    processNotes().catch(err => console.error('[批量补图] 任务失败:', err));
+    return c.json({
+        message: `开始处理 ${notes.length} 篇笔记的封面图`,
+        noteIds: notes.map(n => n.id)
+    });
+});
+// 获取封面图统计
+api.get('/comfyui/stats', (c) => {
+    const stats = db.prepare(`
+    SELECT
+      COUNT(*) as total,
+      SUM(CASE WHEN cover_image IS NOT NULL THEN 1 ELSE 0 END) as with_image,
+      SUM(CASE WHEN cover_image IS NULL THEN 1 ELSE 0 END) as without_image
+    FROM notes
+  `).get();
+    return c.json(stats);
+});
+// 批量为笔记生成多张配图（每篇3张）
+api.post('/comfyui/batch-generate-images', async (c) => {
+    const { limit = 10, imagesPerNote = 3 } = await c.req.json().catch(() => ({}));
+    // 检查 ComfyUI 是否可用
+    const isHealthy = await checkComfyUIHealth();
+    if (!isHealthy) {
+        return c.json({ error: 'ComfyUI 服务不可用' }, 503);
+    }
+    // 获取配图不足的笔记
+    const notes = db.prepare(`
+    SELECT id, title, category, images FROM notes
+    WHERE images IS NULL OR images = '[]' OR images = ''
+    ORDER BY created_at DESC
+    LIMIT ?
+  `).all(limit);
+    if (notes.length === 0) {
+        return c.json({ message: '所有笔记都已有配图', processed: 0 });
+    }
+    // 异步批量生成
+    const processNotes = async () => {
+        let success = 0;
+        let failed = 0;
+        for (const note of notes) {
+            try {
+                console.log(`[批量配图] 处理: ${note.title}`);
+                const imageUrls = [];
+                // 生成多张不同类型的图片
+                const imageTypes = ['cover', 'detail', 'scene'];
+                for (let i = 0; i < imagesPerNote; i++) {
+                    const imageType = imageTypes[i % imageTypes.length];
+                    const result = await generateImage(note.title, note.category || 'beauty', imageType);
+                    if (result.success && result.imageUrl) {
+                        imageUrls.push(result.imageUrl);
+                        console.log(`[批量配图] 图${i + 1}: ${result.imageUrl}`);
+                    }
+                    // 间隔避免请求过快
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+                if (imageUrls.length > 0) {
+                    db.prepare('UPDATE notes SET images = ? WHERE id = ?').run(JSON.stringify(imageUrls), note.id);
+                    console.log(`[批量配图] 成功: ${note.id} -> ${imageUrls.length}张`);
+                    success++;
+                }
+                else {
+                    console.log(`[批量配图] 失败: ${note.id}`);
+                    failed++;
+                }
+            }
+            catch (err) {
+                console.error(`[批量配图] 错误: ${note.id} - ${err.message}`);
+                failed++;
+            }
+            // 每篇笔记间隔
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+        console.log(`[批量配图] 完成: 成功 ${success}, 失败 ${failed}`);
+    };
+    processNotes().catch(err => console.error('[批量配图] 任务失败:', err));
+    return c.json({
+        message: `开始为 ${notes.length} 篇笔记生成配图（每篇${imagesPerNote}张）`,
+        noteIds: notes.map(n => n.id)
+    });
+});
+// 获取配图统计
+api.get('/comfyui/images-stats', (c) => {
+    const stats = db.prepare(`
+    SELECT
+      COUNT(*) as total,
+      SUM(CASE WHEN images IS NOT NULL AND images != '[]' AND images != '' THEN 1 ELSE 0 END) as with_images,
+      SUM(CASE WHEN images IS NULL OR images = '[]' OR images = '' THEN 1 ELSE 0 END) as without_images
+    FROM notes
+  `).get();
+    return c.json(stats);
+});
+// 批量补充评论（每篇达到10条以上）
+api.post('/comments/batch-fill', async (c) => {
+    const { limit = 20, targetComments = 10 } = await c.req.json().catch(() => ({}));
+    // 获取评论不足的笔记
+    const notes = db.prepare(`
+    SELECT n.id, n.title, n.content, n.category,
+           (SELECT COUNT(*) FROM comments WHERE note_id = n.id) as comment_count
+    FROM notes n
+    WHERE (SELECT COUNT(*) FROM comments WHERE note_id = n.id) < ?
+    ORDER BY n.created_at DESC
+    LIMIT ?
+  `).all(targetComments, limit);
+    if (notes.length === 0) {
+        return c.json({ message: '所有笔记评论数都已达标', processed: 0 });
+    }
+    // 异步批量生成评论
+    const processNotes = async () => {
+        let success = 0;
+        let failed = 0;
+        for (const note of notes) {
+            try {
+                const needed = targetComments - note.comment_count;
+                console.log(`[批量评论] 处理: ${note.title} (需要${needed}条)`);
+                const added = await addAIComments(note.id, targetComments);
+                console.log(`[批量评论] 成功: ${note.id} 新增${added}条`);
+                success++;
+            }
+            catch (err) {
+                console.error(`[批量评论] 错误: ${note.id} - ${err.message}`);
+                failed++;
+            }
+            // 间隔避免 API 限流
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+        console.log(`[批量评论] 完成: 成功 ${success}, 失败 ${failed}`);
+    };
+    processNotes().catch(err => console.error('[批量评论] 任务失败:', err));
+    return c.json({
+        message: `开始为 ${notes.length} 篇笔记补充评论（目标${targetComments}条）`,
+        noteIds: notes.map(n => n.id)
+    });
+});
+// 获取评论统计
+api.get('/comments/stats', (c) => {
+    const stats = db.prepare(`
+    SELECT
+      COUNT(*) as total_notes,
+      (SELECT COUNT(*) FROM comments) as total_comments,
+      (SELECT AVG(cnt) FROM (SELECT COUNT(*) as cnt FROM comments GROUP BY note_id)) as avg_comments_per_note,
+      (SELECT COUNT(*) FROM (SELECT note_id FROM comments GROUP BY note_id HAVING COUNT(*) >= 10)) as notes_with_10plus_comments
+    FROM notes
+  `).get();
+    return c.json(stats);
+});
 // 发布笔记（带图片生成）
 api.post('/admin/notes/with-image', async (c) => {
     const { creatorId, title, content, tags, category, generateCover } = await c.req.json();
     let coverImage = null;
     // 如果需要生成封面图
     if (generateCover) {
-        const imageResult = await generateImage(title, category || 'beauty', content);
+        const imageResult = await generateImage(title, category || 'beauty', 'cover');
         if (imageResult.success) {
             coverImage = imageResult.imageUrl;
         }
@@ -346,5 +592,102 @@ api.post('/admin/notes/with-image', async (c) => {
         coverImage,
         message: '发布成功'
     });
+});
+// ========== AI 评论 API ==========
+// 为单篇笔记生成 AI 评论
+api.post('/admin/notes/:id/ai-comments', async (c) => {
+    const noteId = c.req.param('id');
+    const { count } = await c.req.json().catch(() => ({ count: 5 }));
+    const added = await addAIComments(noteId, count || 5);
+    return c.json({ success: true, added });
+});
+// 批量为所有笔记生成评论
+api.post('/admin/batch-comments', async (c) => {
+    const { minComments, maxComments } = await c.req.json().catch(() => ({ minComments: 3, maxComments: 8 }));
+    // 异步执行，立即返回
+    batchAddComments(minComments || 3, maxComments || 8).catch(console.error);
+    return c.json({ success: true, message: '批量评论生成已启动' });
+});
+// 清空所有AI评论
+api.delete('/admin/comments/ai', (c) => {
+    const deleted = clearAIComments();
+    return c.json({ success: true, deleted });
+});
+// ========== 热点话题 API ==========
+// 获取热点话题列表
+api.get('/hot-topics', (c) => {
+    const category = c.req.query('category');
+    const status = c.req.query('status');
+    const limit = parseInt(c.req.query('limit') || '50');
+    const topics = getHotTopics({ category, status, limit });
+    return c.json(topics);
+});
+// 获取单个热点话题
+api.get('/hot-topics/:id', (c) => {
+    const topic = getHotTopic(c.req.param('id'));
+    if (!topic)
+        return c.json({ error: '话题不存在' }, 404);
+    return c.json(topic);
+});
+// 获取热点统计
+api.get('/hot-topics/stats', (c) => {
+    const stats = getHotTopicStats();
+    return c.json(stats);
+});
+// 手动触发热点抓取
+api.post('/hot-topics/crawl', async (c) => {
+    const count = await crawlHotTopics();
+    return c.json({ success: true, count, message: `抓取了 ${count} 个新热点` });
+});
+// 手动触发单个话题生成
+api.post('/hot-topics/:id/generate', async (c) => {
+    const topic = getHotTopic(c.req.param('id'));
+    if (!topic)
+        return c.json({ error: '话题不存在' }, 404);
+    const noteId = await generateNoteForTopic(topic);
+    if (noteId) {
+        return c.json({ success: true, noteId, message: '笔记生成成功' });
+    }
+    else {
+        return c.json({ success: false, error: '生成失败' }, 500);
+    }
+});
+// 批量处理待生成话题
+api.post('/hot-topics/process', async (c) => {
+    const { limit } = await c.req.json().catch(() => ({ limit: 5 }));
+    const result = await processPendingTopics(limit || 5);
+    return c.json(result);
+});
+// 清理过期话题
+api.delete('/hot-topics/expired', (c) => {
+    const count = cleanExpiredTopics();
+    return c.json({ success: true, count, message: `清理了 ${count} 个过期话题` });
+});
+// ========== 调度器 API ==========
+// 获取调度器状态
+api.get('/scheduler/status', (c) => {
+    const status = getSchedulerStatus();
+    return c.json(status);
+});
+// 获取可用任务列表
+api.get('/scheduler/tasks', (c) => {
+    const tasks = getAvailableTasks();
+    return c.json(tasks);
+});
+// 手动触发任务
+api.post('/scheduler/trigger/:task', async (c) => {
+    const taskName = c.req.param('task');
+    const success = await triggerTask(taskName);
+    if (success) {
+        return c.json({ success: true, message: `任务 ${taskName} 已触发` });
+    }
+    else {
+        return c.json({ success: false, error: `任务 ${taskName} 不存在` }, 404);
+    }
+});
+// 获取自动生成统计
+api.get('/auto-generate/stats', (c) => {
+    const stats = getAutoGenerateStats();
+    return c.json(stats);
 });
 export default api;

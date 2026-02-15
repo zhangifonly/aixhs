@@ -74,7 +74,7 @@ async function generateCommentGroup(
   noteTitle: string,
   noteContent: string
 ): Promise<CommentData[]> {
-  const prompt = `你是小红书用户。请为下面这篇笔记写3条短评论。
+  const prompt = `你是小红薯用户。请为下面这篇笔记写3条短评论。
 
 笔记标题：${noteTitle}
 笔记内容：${noteContent.slice(0, 150)}...
@@ -119,7 +119,7 @@ async function generateSingleComment(
   noteContent: string,
   commenter: typeof COMMENTERS[0]
 ): Promise<string | null> {
-  const prompt = `你是"${commenter.nickname}"（${commenter.persona}），请为这篇小红书笔记写一条短评论。
+  const prompt = `你是"${commenter.nickname}"（${commenter.persona}），请为这篇小红薯笔记写一条短评论。
 
 笔记标题：${noteTitle}
 笔记内容：${noteContent.slice(0, 100)}...

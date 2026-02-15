@@ -23,7 +23,7 @@ function generateUserId() {
     return `user_${hash}_account__session_${randomUUID()}`;
 }
 export async function* createChatStream(messages, options) {
-    const { apiKey, baseURL = 'https://api.anthropic.com', model = 'claude-sonnet-4-5-20250929', systemPrompt = '你是一个小红书博主', maxTokens = 4096, } = options;
+    const { apiKey, baseURL = 'https://api.anthropic.com', model = 'claude-sonnet-4-5-20250929', systemPrompt = '你是一个小红薯博主', maxTokens = 4096, } = options;
     const apiUrl = `${baseURL.replace(/\/$/, '')}/v1/messages`;
     const headers = {
         'Content-Type': 'application/json',

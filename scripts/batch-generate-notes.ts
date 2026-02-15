@@ -143,7 +143,7 @@ const TOPICS_BY_CATEGORY: Record<string, { creatorId: string; topics: string[] }
 
 // 生成单篇笔记内容
 async function generateNoteContent(topic: string, creatorId: string, category: string): Promise<{ title: string; content: string; tags: string[] } | null> {
-  const systemPrompt = `你是一个小红书博主，请根据话题写一篇小红书笔记。
+  const systemPrompt = `你是一个小红薯博主，请根据话题写一篇小红薯笔记。
 
 要求：
 1. 标题要吸引人，带emoji
@@ -168,7 +168,7 @@ async function generateNoteContent(topic: string, creatorId: string, category: s
       body: JSON.stringify({
         model: CLAUDE_API.model,
         max_tokens: 2000,
-        messages: [{ role: 'user', content: `请写一篇关于「${topic}」的小红书笔记` }],
+        messages: [{ role: 'user', content: `请写一篇关于「${topic}」的小红薯笔记` }],
         system: systemPrompt
       })
     })

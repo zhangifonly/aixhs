@@ -50,7 +50,7 @@ export async function* createChatStream(
     apiKey,
     baseURL = 'https://api.anthropic.com',
     model = 'claude-sonnet-4-5-20250929',
-    systemPrompt = '你是一个小红书博主',
+    systemPrompt = '你是一个小红薯博主',
     maxTokens = 4096,
   } = options
 

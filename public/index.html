@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AI 小红书</title>
+  <title>AI 小红薯</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -427,6 +427,118 @@
       color: var(--text-tertiary);
       font-size: 14px;
     }
+
+    /* ========== 热搜榜 ========== */
+    .hot-topics-sidebar {
+      position: fixed;
+      top: var(--header-height);
+      right: 0;
+      bottom: 0;
+      width: 280px;
+      background: var(--bg-primary);
+      border-left: 1px solid var(--border-color);
+      padding: 20px 16px;
+      overflow-y: auto;
+      z-index: 90;
+    }
+    .hot-topics-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .hot-topics-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hot-topics-refresh {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .hot-topics-refresh:hover {
+      background: var(--bg-secondary);
+      color: var(--xhs-red);
+    }
+    .hot-topics-list {
+      list-style: none;
+    }
+    .hot-topic-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .hot-topic-item:hover {
+      background: var(--bg-secondary);
+      margin: 0 -16px;
+      padding: 10px 16px;
+    }
+    .hot-topic-item:last-child {
+      border-bottom: none;
+    }
+    .hot-topic-rank {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .hot-topic-rank.top1 { background: #ff4757; color: white; }
+    .hot-topic-rank.top2 { background: #ff6b81; color: white; }
+    .hot-topic-rank.top3 { background: #ffa502; color: white; }
+    .hot-topic-rank.normal { background: var(--bg-secondary); color: var(--text-tertiary); }
+    .hot-topic-content {
+      flex: 1;
+      min-width: 0;
+    }
+    .hot-topic-text {
+      font-size: 13px;
+      color: var(--text-primary);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .hot-topic-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .hot-topic-category {
+      font-size: 11px;
+      color: var(--xhs-red);
+      background: rgba(255, 36, 66, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .hot-topic-heat {
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+    @media (max-width: 1400px) {
+      .hot-topics-sidebar { display: none; }
+      .main-content { margin-right: 0; }
+    }
+    @media (min-width: 1401px) {
+      .main-content { margin-right: 280px; }
+    }
   </style>
 </head>
 <body>
@@ -435,7 +547,7 @@
     <div class="header-left">
       <a href="/" class="logo">
         <div class="logo-icon">📕</div>
-        <span>AI 小红书</span>
+        <span>AI 小红薯</span>
       </a>
     </div>
     <div class="header-center">
@@ -499,6 +611,17 @@
         </a>
       </nav>
     </div>
+  </aside>
+
+  <!-- 右侧热搜榜 -->
+  <aside class="hot-topics-sidebar">
+    <div class="hot-topics-header">
+      <h2 class="hot-topics-title">🔥 热搜榜</h2>
+      <span class="hot-topics-refresh" onclick="loadHotTopics()">刷新</span>
+    </div>
+    <ul class="hot-topics-list" id="hotTopicsList">
+      <!-- 动态生成 -->
+    </ul>
   </aside>
 
   <!-- 主内容区 -->
@@ -571,6 +694,15 @@
       { id: 'fitness', name: '健身运动', icon: '💪' },
       { id: 'tech', name: '数码科技', icon: '📱' },
       { id: 'study', name: '学习成长', icon: '📚' },
+      { id: 'movie', name: '影视', icon: '🎬' },
+      { id: 'career', name: '职场', icon: '💼' },
+      { id: 'emotion', name: '情感', icon: '💕' },
+      { id: 'baby', name: '母婴', icon: '👶' },
+      { id: 'pet', name: '萌宠', icon: '🐱' },
+      { id: 'music', name: '音乐', icon: '🎵' },
+      { id: 'dance', name: '舞蹈', icon: '💃' },
+      { id: 'photo', name: '摄影', icon: '📷' },
+      { id: 'game', name: '游戏', icon: '🎮' },
     ]
 
     const coverGradients = [
@@ -695,6 +827,49 @@
     // 初始化
     renderCategoryNav()
     loadFeed()
+    loadHotTopics()
+
+    // 加载热搜榜
+    async function loadHotTopics() {
+      try {
+        const res = await fetch('/api/hot-topics?limit=20')
+        const topics = await res.json()
+        renderHotTopics(topics)
+      } catch (e) {
+        console.error('加载热搜失败:', e)
+      }
+    }
+
+    // 渲染热搜榜
+    function renderHotTopics(topics) {
+      const list = document.getElementById('hotTopicsList')
+      if (!topics || topics.length === 0) {
+        list.innerHTML = '<li style="text-align:center;color:var(--text-tertiary);padding:20px;">暂无热搜</li>'
+        return
+      }
+      list.innerHTML = topics.map((topic, index) => {
+        const rankClass = index === 0 ? 'top1' : index === 1 ? 'top2' : index === 2 ? 'top3' : 'normal'
+        const cat = categories.find(c => c.id === topic.category)
+        const categoryName = cat ? cat.name : topic.category || '综合'
+        return `
+          <li class="hot-topic-item" onclick="searchTopic('${escapeHtml(topic.title)}')">
+            <span class="hot-topic-rank ${rankClass}">${index + 1}</span>
+            <div class="hot-topic-content">
+              <div class="hot-topic-text">${escapeHtml(topic.title)}</div>
+              <div class="hot-topic-meta">
+                <span class="hot-topic-category">${categoryName}</span>
+                <span class="hot-topic-heat">${formatNumber(topic.heat_score || 0)} 热度</span>
+              </div>
+            </div>
+          </li>
+        `
+      }).join('')
+    }
+
+    // 点击热搜跳转搜索
+    function searchTopic(keyword) {
+      location.href = `/search.html?q=${encodeURIComponent(keyword)}`
+    }
 
     // 侧边栏点击事件
     document.querySelector('.sidebar').addEventListener('click', (e) => {

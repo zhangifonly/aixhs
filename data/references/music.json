@@ -1,0 +1,35 @@
+[
+  {
+    "id": "music_001",
+    "title": "单曲循环停不下来的歌｜私藏歌单",
+    "content": "这些歌我真的听了100遍！！\n\n【华语】\n1. 《富士山下》- 陈奕迅\n粤语神作，百听不厌\n\n2. 《晴天》- 周杰伦\n青春的味道\n\n3. 《起风了》- 买辣椒也用券\n\"我曾难自拔于世界之大\"\n\n4. 《漠河舞厅》- 柳爽\n听哭了无数次\n\n【英文】\n5. 《Someone Like You》- Adele\n失恋必听\n\n6. 《See You Again》\n每次听都想哭\n\n7. 《Shape of You》- Ed Sheeran\n超级洗脑\n\n【日韩】\n8. 《Lemon》- 米津玄师\n神曲！\n\n9. 《春夏秋冬》- BIGBANG\n青春回忆\n\n10. 《夜に駆ける》- YOASOBI\n太上头了\n\n你们单曲循环的是哪首？\n评论区分享一下！",
+    "category": "music",
+    "subTopic": "playlist",
+    "quality": "excellent",
+    "keyFeatures": "分类清晰，简短点评，引发共鸣",
+    "metrics": {"likes": 34567, "collects": 23456},
+    "tags": ["#歌单", "#音乐推荐", "#单曲循环", "#宝藏歌曲"]
+  },
+  {
+    "id": "music_002",
+    "title": "深夜emo歌单｜一个人的时候听",
+    "content": "深夜睡不着的时候\n就听这些歌\n\n【安静治愈】\n《夜空中最亮的星》\n《平凡之路》\n《追光者》\n《后来》\n\n【想哭的时候】\n《说散就散》\n《体面》\n《慢慢喜欢你》\n《可惜没如果》\n\n【怀念过去】\n《那些年》\n《同桌的你》\n《老男孩》\n《北京东路的日子》\n\n【英文emo】\n《Fix You》- Coldplay\n《Let Her Go》\n《Say Something》\n《All of Me》\n\n听歌的时候\n允许自己难过一会儿\n哭完就好了\n\n明天又是新的一天\n\n你们深夜都听什么歌？",
+    "category": "music",
+    "subTopic": "mood",
+    "quality": "excellent",
+    "keyFeatures": "场景化推荐，情绪共鸣，治愈文案",
+    "metrics": {"likes": 45678, "collects": 34567},
+    "tags": ["#深夜歌单", "#emo", "#治愈", "#音乐"]
+  },
+  {
+    "id": "music_003",
+    "title": "学习工作BGM｜专注力拉满",
+    "content": "学习/工作的时候听什么？\n\n分享我的专注力歌单：\n\n【纯音乐】\n久石让的所有曲子\n《Summer》《天空之城》必听\n\n坂本龙一\n《Merry Christmas Mr. Lawrence》\n\n【轻音乐】\n咖啡厅爵士\nLofi Hip Hop\n钢琴曲合集\n\n【白噪音】\n雨声\n海浪声\n咖啡厅环境音\n\n【不推荐】\n❌ 有歌词的歌（会跟着唱）\n❌ 太嗨的电音（会想跳舞）\n❌ 太悲伤的歌（会emo）\n\n使用tips：\n1. 音量调小一点\n2. 用耳机效果更好\n3. 找到适合自己的类型\n\n网易云搜\"学习\"有很多歌单\n\n你们学习听什么？",
+    "category": "music",
+    "subTopic": "study",
+    "quality": "excellent",
+    "keyFeatures": "场景实用，正反推荐，使用建议",
+    "metrics": {"likes": 56789, "collects": 45678},
+    "tags": ["#学习歌单", "#专注力", "#BGM", "#工作音乐"]
+  }
+]

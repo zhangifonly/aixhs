@@ -22,7 +22,7 @@ if (!existsSync(UPLOADS_DIR)) {
 }
 
 /**
- * 小红书风格的工作流模板
+ * 小红薯风格的工作流模板
  * 使用 Z-Image-Turbo 模型快速生成
  * 参考: QWEN-Anime-L_00002_.png 工作流
  *
@@ -129,44 +129,36 @@ function createWorkflow(prompt: string, negativePrompt: string = ''): object {
 export type ImageType = 'cover' | 'detail' | 'scene'
 
 /**
- * 用 AI 根据文章标题生成图片提示词
- * 每篇文章都会得到独特的、与内容相关的提示词
+ * 用 AI 根据文章标题生成中文图片提示词
+ * zImage 模型支持中文提示词
  */
 async function generateImagePromptWithAI(title: string, category: string): Promise<string> {
-  const categoryNames: Record<string, string> = {
-    beauty: '美妆护肤',
-    fashion: '穿搭时尚',
-    food: '美食探店',
-    travel: '旅行攻略',
-    home: '家居生活',
-    fitness: '健身运动',
-    tech: '数码科技',
-    study: '学习成长'
-  }
+  const systemPrompt = `你是一个图片提示词生成器。根据小红书文章标题生成中文图片提示词。
 
-  const systemPrompt = `You are an image prompt generator. Generate English prompts for AI image generation based on Chinese article titles.
+规则：
+1. 只输出提示词，不要其他内容
+2. 描述具体的物品、场景、光线、风格、构图
+3. 禁止出现人物、人脸、文字、logo、水印
+4. 30-60个中文字
+5. 风格：精致、美观、适合小红书的审美
 
-Rules:
-1. Output ONLY the English prompt, nothing else
-2. Describe specific objects, scenes, lighting, style, composition
-3. NO humans, faces, text, logos, watermarks
-4. 50-80 English words
-5. Style: elegant, aesthetic, suitable for Xiaohongshu (Chinese social media)
+示例：
+输入：冬季嘴唇干裂起皮？这个方法3天见效
+输出：护唇产品平铺摆拍，粉色润唇膏和唇膜，玫瑰花瓣点缀，大理石背景，蜂蜜质地，柔和暖光，美妆产品摄影，精致美学
 
-Examples:
-Input: 冬季嘴唇干裂起皮？这个方法3天见效
-Output: lip care products flat lay, pink lip balm tubes and jars, rose petals scattered, soft pink marble background, honey dripping, moisturizing texture, warm soft lighting, beauty product photography, luxurious aesthetic, top down view
+输入：哈尔滨冰雪大世界攻略
+输出：哈尔滨冰雕夜景，彩色灯光照亮冰雪城堡，雪花飘落，冬日仙境，蓝调时刻，梦幻氛围，广角风景，冰雪建筑细节
 
-Input: 哈尔滨冰雪大世界攻略
-Output: Harbin ice sculpture at night, colorful LED lights illuminating ice castle, snow falling gently, winter wonderland scene, blue hour photography, magical atmosphere, wide angle landscape, frozen architecture details
+输入：iPhone 16 Pro使用体验
+输出：iPhone 16 Pro放在大理石桌面，钛金属质感，相机模组特写，极简布置，柔和窗光，数码产品摄影，苹果美学
 
-Input: iPhone 16 Pro使用体验
-Output: iPhone 16 Pro on marble desk, titanium finish gleaming, camera module detail, minimalist setup, soft window light, tech product photography, Apple aesthetic, clean composition, premium feel`
+输入：空气炸锅食谱分享
+输出：空气炸锅美食摆盘，金黄酥脆的炸鸡翅，新鲜蔬菜配菜，木质餐桌，暖色调灯光，美食摄影，家常料理风格`
 
-  const userPrompt = `Title: ${title}
-Category: ${categoryNames[category] || category}
+  const userPrompt = `标题：${title}
+分类：${category}
 
-Generate the image prompt:`
+生成图片提示词：`
 
   try {
     const response = await fetch(`${CLAUDE_API.baseURL}/v1/messages`, {
@@ -199,19 +191,13 @@ Generate the image prompt:`
       .replace(/\n.*/s, '') // 只取第一行
       .trim()
 
-    // 如果结果包含中文，说明 AI 没有正确理解，使用备用方案
-    if (/[\u4e00-\u9fa5]/.test(cleanPrompt)) {
-      console.log('[AI Prompt] 返回包含中文，使用备用方案')
-      return ''
-    }
-
-    // 如果太短，也使用备用方案
-    if (cleanPrompt.length < 30) {
+    // 如果太短，使用备用方案
+    if (cleanPrompt.length < 15) {
       console.log('[AI Prompt] 返回太短，使用备用方案')
       return ''
     }
 
-    console.log(`[AI Prompt] 生成: ${cleanPrompt.slice(0, 60)}...`)
+    console.log(`[AI Prompt] 生成: ${cleanPrompt.slice(0, 40)}...`)
     return cleanPrompt
   } catch (error) {
     console.log('[AI Prompt] 生成失败，使用备用方案:', error)
@@ -220,130 +206,130 @@ Generate the image prompt:`
 }
 
 /**
- * 备用方案：从标题中提取关键词
+ * 备用方案：从标题中提取中文关键词
  */
 function extractKeywordsFromTitle(title: string, category: string): string {
   const keywordMaps: Record<string, Record<string, string>> = {
     beauty: {
-      '嘴唇': 'lip balm and lip care products, rose petals, honey texture',
-      '唇': 'lip gloss tubes, glossy texture, pink aesthetic',
-      '美白': 'whitening serum bottles, vitamin C, bright clean background',
-      '保湿': 'moisturizer jars, water droplets, hydrating texture',
-      '干皮': 'rich cream texture, nourishing oils, winter skincare',
-      '油皮': 'mattifying products, oil control, fresh green tea leaves',
-      '毛孔': 'pore care products, clean skin texture, minimalist',
-      '敏感': 'gentle skincare, calming ingredients, soft pink tones',
-      '抗老': 'anti-aging serum, retinol bottles, luxury gold accents',
-      '眼霜': 'eye cream jar, delicate texture, pearl elements',
-      '精华': 'serum droppers, glass bottles, golden liquid',
-      '面膜': 'sheet masks, spa setting, cucumber slices',
-      '防晒': 'sunscreen bottles, beach elements, summer vibes',
-      '底妆': 'foundation bottles, makeup sponges, flawless texture',
-      '痘': 'acne treatment, tea tree, clean clinical aesthetic',
-      '水乳': 'toner and lotion set, matching bottles, minimalist',
-      '早C晚A': 'vitamin C and retinol serums, day and night concept'
+      '嘴唇': '护唇产品，润唇膏，玫瑰花瓣，蜂蜜质地',
+      '唇': '唇釉唇彩，光泽质感，粉色美学',
+      '美白': '美白精华瓶，维C成分，明亮干净背景',
+      '保湿': '保湿面霜，水珠质感，补水护肤',
+      '干皮': '滋润面霜质地，滋养精油，冬季护肤',
+      '油皮': '控油产品，清爽质地，绿茶元素',
+      '毛孔': '毛孔护理产品，清洁肌肤质感，极简风格',
+      '敏感': '温和护肤品，舒缓成分，柔和粉色调',
+      '抗老': '抗衰精华，视黄醇瓶装，奢华金色点缀',
+      '眼霜': '眼霜罐装，细腻质地，珍珠元素',
+      '精华': '精华滴管，玻璃瓶，金色液体',
+      '面膜': '面膜片，水疗场景，黄瓜片',
+      '防晒': '防晒霜瓶装，海滩元素，夏日氛围',
+      '底妆': '粉底液瓶装，美妆蛋，无瑕质感',
+      '痘': '祛痘产品，茶树成分，清爽临床美学',
+      '水乳': '水乳套装，配套瓶装，极简风格',
+      '早C晚A': '维C和视黄醇精华，日夜护肤概念'
     },
     fashion: {
-      '羽绒服': 'puffer jacket flat lay, winter accessories, cozy wool scarf',
-      '大衣': 'wool coat draped elegantly, leather bag, autumn leaves',
-      '针织': 'knitwear stack, cable knit texture, warm tones',
-      '小个子': 'petite outfit flat lay, high waist pants, platform shoes',
-      '显瘦': 'slimming black outfit, vertical lines, elegant silhouette',
-      '通勤': 'office outfit flat lay, laptop bag, coffee cup',
-      '约会': 'romantic dress, flowers, soft pink accessories',
-      '配饰': 'accessories arrangement, jewelry, scarves, hats',
-      '围巾': 'cashmere scarves folded, winter accessories, warm colors',
-      '帽子': 'hat collection, berets and beanies, stylish arrangement',
-      '叠穿': 'layered outfit flat lay, multiple textures, autumn style',
-      '老钱风': 'quiet luxury items, cashmere, pearls, neutral tones',
-      '美拉德': 'brown tones outfit, caramel colors, autumn aesthetic'
+      '羽绒服': '羽绒服平铺，冬季配饰，羊毛围巾',
+      '大衣': '羊毛大衣优雅垂坠，皮包，秋叶',
+      '针织': '针织衫堆叠，麻花纹理，暖色调',
+      '小个子': '小个子穿搭平铺，高腰裤，厚底鞋',
+      '显瘦': '显瘦黑色穿搭，竖条纹，优雅轮廓',
+      '通勤': '通勤穿搭平铺，电脑包，咖啡杯',
+      '约会': '约会裙装，鲜花，粉色配饰',
+      '配饰': '配饰摆放，首饰，围巾，帽子',
+      '围巾': '羊绒围巾折叠，冬季配饰，暖色',
+      '帽子': '帽子系列，贝雷帽和毛线帽，时尚摆放',
+      '叠穿': '叠穿穿搭平铺，多层次质感，秋季风格',
+      '老钱风': '静奢单品，羊绒，珍珠，中性色调',
+      '美拉德': '棕色系穿搭，焦糖色，秋季美学'
     },
     food: {
-      '火锅': 'hot pot with fresh ingredients, steam rising, red soup base',
-      '奶茶': 'bubble tea cups, tapioca pearls, aesthetic cafe setting',
-      '早餐': 'breakfast spread, eggs and toast, morning sunlight',
-      '减脂': 'healthy salad bowl, colorful vegetables, fitness aesthetic',
-      '空气炸锅': 'crispy air fried food, golden texture, kitchen setting',
-      '甜品': 'dessert arrangement, macarons and cakes, pastel colors',
-      '宵夜': 'late night snacks, neon lights, street food aesthetic',
-      '年夜饭': 'Chinese New Year feast, red decorations, family dishes',
-      '蘸料': 'dipping sauces in small bowls, spices, ingredients',
-      '红薯': 'roasted sweet potatoes, autumn harvest, warm colors'
+      '火锅': '火锅配新鲜食材，热气腾腾，红汤锅底',
+      '奶茶': '奶茶杯，珍珠，精致咖啡厅场景',
+      '早餐': '早餐摆盘，鸡蛋吐司，晨光',
+      '减脂': '健康沙拉碗，彩色蔬菜，健身美学',
+      '空气炸锅': '空气炸锅美食，金黄酥脆，厨房场景',
+      '甜品': '甜品摆放，马卡龙蛋糕，粉彩色调',
+      '宵夜': '深夜小吃，霓虹灯，街头美食风格',
+      '年夜饭': '年夜饭盛宴，红色装饰，家常菜',
+      '蘸料': '蘸料小碗，香料，食材',
+      '红薯': '烤红薯，秋收，暖色调'
     },
     travel: {
-      '哈尔滨': 'Harbin ice sculptures, colorful lights, snow scenery',
-      '云南': 'Yunnan terraced rice fields, misty mountains, ethnic culture',
-      '新疆': 'Xinjiang desert landscape, snow mountains, silk road',
-      '西双版纳': 'tropical rainforest, palm trees, Buddhist temple',
-      '厦门': 'Xiamen coastal scenery, Gulangyu island, colonial architecture',
-      '成都': 'Chengdu teahouse, bamboo forest, panda elements',
-      '日本': 'Japanese temple, cherry blossoms, traditional garden',
-      '泰国': 'Thai beach sunset, tropical paradise, golden temple',
-      '滑雪': 'ski resort, snow mountains, winter sports equipment',
-      '温泉': 'hot spring steam, Japanese onsen, relaxing atmosphere'
+      '哈尔滨': '哈尔滨冰雕，彩色灯光，雪景',
+      '云南': '云南梯田，云雾山峦，民族风情',
+      '新疆': '新疆沙漠风光，雪山，丝绸之路',
+      '西双版纳': '热带雨林，棕榈树，佛寺',
+      '厦门': '厦门海岸风光，鼓浪屿，殖民建筑',
+      '成都': '成都茶馆，竹林，熊猫元素',
+      '日本': '日本寺庙，樱花，传统庭院',
+      '泰国': '泰国海滩日落，热带天堂，金色寺庙',
+      '滑雪': '滑雪场，雪山，冬季运动装备',
+      '温泉': '温泉热气，日式温泉，放松氛围'
     },
     home: {
-      '出租屋': 'small apartment makeover, cozy corner, fairy lights',
-      '收纳': 'organized storage boxes, tidy shelves, minimalist',
-      '厨房': 'kitchen organization, spice jars, clean countertop',
-      '卧室': 'cozy bedroom, soft bedding, warm lamp light',
-      '浴室': 'bathroom organization, toiletries arranged, spa vibes',
-      '绿植': 'indoor plants arrangement, monstera, succulent garden',
-      '香薰': 'scented candles, diffuser, relaxing atmosphere',
-      '床品': 'luxurious bedding set, soft textures, hotel style',
-      '取暖': 'cozy heater, warm blanket, winter comfort',
-      '衣柜': 'organized closet, color coordinated clothes, neat hangers'
+      '出租屋': '小公寓改造，温馨角落，小灯串',
+      '收纳': '收纳盒整理，整洁货架，极简风格',
+      '厨房': '厨房收纳，调料罐，干净台面',
+      '卧室': '温馨卧室，柔软床品，暖色灯光',
+      '浴室': '浴室收纳，洗漱用品摆放，水疗氛围',
+      '绿植': '室内植物摆放，龟背竹，多肉花园',
+      '香薰': '香薰蜡烛，香薰机，放松氛围',
+      '床品': '奢华床品套装，柔软质感，酒店风格',
+      '取暖': '温暖取暖器，毛毯，冬日舒适',
+      '衣柜': '整洁衣柜，颜色分类衣物，整齐衣架'
     },
     fitness: {
-      '帕梅拉': 'home workout setup, yoga mat, resistance bands',
-      '腹肌': 'ab roller and mat, core workout equipment, energetic',
-      '臀腿': 'resistance bands, booty workout, gym aesthetic',
-      '跑步': 'running shoes, fitness tracker, outdoor trail',
-      '瑜伽': 'yoga mat and blocks, peaceful setting, plants',
-      '拉伸': 'stretching equipment, foam roller, recovery tools',
-      '减脂': 'cardio equipment, jump rope, sweat towel',
-      '增肌': 'dumbbells and protein shake, gym setting, powerful',
-      '体态': 'posture corrector, alignment tools, wellness'
+      '帕梅拉': '居家健身布置，瑜伽垫，弹力带',
+      '腹肌': '腹肌轮和垫子，核心训练器材，活力感',
+      '臀腿': '弹力带，臀腿训练，健身房美学',
+      '跑步': '跑鞋，运动手表，户外跑道',
+      '瑜伽': '瑜伽垫和瑜伽砖，宁静场景，绿植',
+      '拉伸': '拉伸器材，泡沫轴，恢复工具',
+      '减脂': '有氧器材，跳绑，运动毛巾',
+      '增肌': '哑铃和蛋白粉，健身房场景，力量感',
+      '体态': '体态矫正器，调整工具，健康'
     },
     tech: {
-      'iPhone': 'iPhone on marble surface, minimalist, Apple aesthetic',
-      '华为': 'Huawei smartphone, modern tech, sleek design',
-      '小米': 'Xiaomi devices ecosystem, smart home, modern',
-      '手机': 'smartphone flat lay, accessories, tech lifestyle',
-      'MacBook': 'MacBook on wooden desk, coffee, creative workspace',
-      '笔记本': 'laptop workspace, productivity setup, clean desk',
-      'iPad': 'iPad with Apple Pencil, creative tools, digital art',
-      '耳机': 'wireless earbuds, premium headphones, audio gear',
-      '充电': 'power bank and cables, charging station, organized',
-      '游戏本': 'gaming laptop, RGB lighting, gaming peripherals'
+      'iPhone': 'iPhone放在大理石上，极简风格，苹果美学',
+      '华为': '华为手机，现代科技，流线设计',
+      '小米': '小米设备生态，智能家居，现代感',
+      '手机': '手机平铺，配件，科技生活方式',
+      'MacBook': 'MacBook放在木桌上，咖啡，创意工作空间',
+      '笔记本': '笔记本电脑工作区，效率布置，干净桌面',
+      'iPad': 'iPad配Apple Pencil，创意工具，数字艺术',
+      '耳机': '无线耳机，高端头戴耳机，音频设备',
+      '充电': '充电宝和数据线，充电站，整齐摆放',
+      '游戏本': '游戏笔记本，RGB灯光，游戏外设'
     },
     study: {
-      '考研': 'study books stacked, highlighters, exam preparation',
-      '考公': 'civil service exam materials, organized notes, desk lamp',
-      '英语': 'English textbooks, vocabulary cards, language learning',
-      '时间管理': 'planner and calendar, productivity tools, organized',
-      '自律': 'habit tracker, morning routine items, motivational',
-      '读书': 'book stack, reading glasses, cozy reading nook',
-      '副业': 'laptop and notebook, side hustle setup, entrepreneurial',
-      'Excel': 'spreadsheet on screen, data analysis, professional',
-      'PPT': 'presentation materials, business meeting setup',
-      '面试': 'professional portfolio, resume, interview preparation',
-      '简历': 'resume document, career planning, professional items',
-      '新年计划': 'goal setting journal, new year planner, fresh start'
+      '考研': '考研书籍堆叠，荧光笔，备考场景',
+      '考公': '公务员考试资料，整理笔记，台灯',
+      '英语': '英语教材，单词卡，语言学习',
+      '时间管理': '计划本和日历，效率工具，整齐摆放',
+      '自律': '习惯追踪器，晨间物品，励志感',
+      '读书': '书籍堆叠，阅读眼镜，温馨阅读角',
+      '副业': '笔记本电脑和笔记本，副业布置，创业感',
+      'Excel': '屏幕上的表格，数据分析，专业感',
+      'PPT': '演示材料，商务会议布置',
+      '面试': '专业作品集，简历，面试准备',
+      '简历': '简历文档，职业规划，专业物品',
+      '新年计划': '目标设定日记，新年计划本，新开始'
     }
   }
 
   const keywords = keywordMaps[category] || {}
-  for (const [cn, en] of Object.entries(keywords)) {
+  for (const [cn, prompt] of Object.entries(keywords)) {
     if (title.includes(cn)) {
-      return en
+      return prompt
     }
   }
   return ''
 }
 
 /**
- * 根据板块和图片类型生成差异化的英文提示词
+ * 根据板块和图片类型生成差异化的中文提示词
  * 优先使用 AI 生成，失败时使用备用方案
  */
 export async function buildImagePromptAsync(
@@ -353,8 +339,8 @@ export async function buildImagePromptAsync(
 ): Promise<string> {
   // 尝试用 AI 生成
   const aiPrompt = await generateImagePromptWithAI(title, category)
-  if (aiPrompt && aiPrompt.length > 20) {
-    return `${aiPrompt}, high detail, 4K resolution, no text, no watermark, no logo, no human, no person, no face, no portrait`
+  if (aiPrompt && aiPrompt.length > 10) {
+    return `${aiPrompt}，高清细节，4K分辨率，无文字，无水印，无logo，无人物，无人脸`
   }
 
   // 备用方案
@@ -362,7 +348,7 @@ export async function buildImagePromptAsync(
 }
 
 /**
- * 同步版本的提示词生成（备用方案）
+ * 同步版本的提示词生成（备用方案）- 中文版
  */
 export function buildImagePrompt(
   title: string,
@@ -373,57 +359,57 @@ export function buildImagePrompt(
 
   const categoryStyles: Record<string, Record<ImageType, string>> = {
     beauty: {
-      cover: `skincare product photography, ${titleKeywords || 'elegant cosmetic bottles and jars on marble'}, soft natural lighting, luxury aesthetic, professional commercial photography`,
-      detail: `cosmetic texture close-up, ${titleKeywords || 'cream swirl on glass surface'}, macro photography, soft focus background`,
-      scene: `bathroom vanity scene, ${titleKeywords || 'skincare products arranged'}, morning routine, soft window light`
+      cover: `护肤品摄影，${titleKeywords || '精致化妆品瓶罐摆放在大理石上'}，柔和自然光，奢华美学，专业商业摄影`,
+      detail: `化妆品质地特写，${titleKeywords || '玻璃表面的面霜纹理'}，微距摄影，柔焦背景`,
+      scene: `浴室梳妆台场景，${titleKeywords || '护肤品整齐摆放'}，晨间护肤，柔和窗光`
     },
     fashion: {
-      cover: `fashion flat lay photography, ${titleKeywords || 'complete outfit arrangement'}, minimalist white background, magazine style`,
-      detail: `clothing fabric texture, ${titleKeywords || 'stitching details'}, macro fashion photography`,
-      scene: `wardrobe interior, ${titleKeywords || 'clothes hanging neatly'}, organized closet, soft natural light`
+      cover: `时尚穿搭平铺摄影，${titleKeywords || '完整穿搭组合'}，极简白色背景，杂志风格`,
+      detail: `服装面料质感，${titleKeywords || '缝线细节'}，微距时尚摄影`,
+      scene: `衣柜内部，${titleKeywords || '衣物整齐悬挂'}，整洁衣橱，柔和自然光`
     },
     food: {
-      cover: `food photography, ${titleKeywords || 'delicious dish with beautiful plating'}, appetizing colors, warm lighting, 45 degree angle`,
-      detail: `food ingredient close-up, ${titleKeywords || 'fresh ingredients'}, macro food photography, vibrant colors`,
-      scene: `dining table setting, ${titleKeywords || 'meal ready to serve'}, cozy restaurant atmosphere`
+      cover: `美食摄影，${titleKeywords || '精美摆盘的美味佳肴'}，诱人色彩，暖色灯光，45度角`,
+      detail: `食材特写，${titleKeywords || '新鲜食材'}，微距美食摄影，鲜艳色彩`,
+      scene: `餐桌布置，${titleKeywords || '即将享用的美食'}，温馨餐厅氛围`
     },
     travel: {
-      cover: `travel landscape photography, ${titleKeywords || 'magnificent natural scenery'}, golden hour lighting, wide angle, vibrant colors`,
-      detail: `travel details, ${titleKeywords || 'local architecture'}, cultural elements, documentary style`,
-      scene: `travel lifestyle scene, ${titleKeywords || 'scenic viewpoint'}, wanderlust atmosphere`
+      cover: `旅行风景摄影，${titleKeywords || '壮丽自然风光'}，黄金时刻光线，广角，鲜艳色彩`,
+      detail: `旅行细节，${titleKeywords || '当地建筑'}，文化元素，纪实风格`,
+      scene: `旅行生活场景，${titleKeywords || '风景观景点'}，旅行氛围`
     },
     home: {
-      cover: `interior design photography, ${titleKeywords || 'cozy living space'}, minimalist Nordic style, soft natural light`,
-      detail: `home decor close-up, ${titleKeywords || 'decorative objects'}, texture details, warm tones`,
-      scene: `cozy corner scene, ${titleKeywords || 'reading nook'}, warm lamp light, hygge atmosphere`
+      cover: `室内设计摄影，${titleKeywords || '温馨生活空间'}，极简北欧风格，柔和自然光`,
+      detail: `家居装饰特写，${titleKeywords || '装饰物品'}，质感细节，暖色调`,
+      scene: `温馨角落场景，${titleKeywords || '阅读角'}，暖色灯光，舒适氛围`
     },
     fitness: {
-      cover: `fitness equipment photography, ${titleKeywords || 'professional gym equipment'}, bright environment, energetic atmosphere`,
-      detail: `fitness gear close-up, ${titleKeywords || 'workout accessories'}, product photography`,
-      scene: `home gym setup, ${titleKeywords || 'workout space'}, morning exercise atmosphere`
+      cover: `健身器材摄影，${titleKeywords || '专业健身器材'}，明亮环境，活力氛围`,
+      detail: `健身装备特写，${titleKeywords || '运动配件'}，产品摄影`,
+      scene: `家庭健身房布置，${titleKeywords || '运动空间'}，晨间运动氛围`
     },
     tech: {
-      cover: `digital product photography, ${titleKeywords || 'elegant electronic device'}, minimalist background, professional lighting`,
-      detail: `tech product close-up, ${titleKeywords || 'device details'}, macro product photography`,
-      scene: `desk setup scene, ${titleKeywords || 'workspace with devices'}, productive atmosphere`
+      cover: `数码产品摄影，${titleKeywords || '精致电子设备'}，极简背景，专业灯光`,
+      detail: `科技产品特写，${titleKeywords || '设备细节'}，微距产品摄影`,
+      scene: `桌面布置场景，${titleKeywords || '设备工作区'}，高效氛围`
     },
     study: {
-      cover: `study desk photography, ${titleKeywords || 'books and stationery'}, warm desk lamp lighting, comfortable atmosphere`,
-      detail: `stationery close-up, ${titleKeywords || 'notebook pages'}, macro photography, soft lighting`,
-      scene: `cozy study corner, ${titleKeywords || 'bookshelf background'}, warm ambient light`
+      cover: `书桌摄影，${titleKeywords || '书籍和文具'}，暖色台灯光，舒适氛围`,
+      detail: `文具特写，${titleKeywords || '笔记本页面'}，微距摄影，柔和灯光`,
+      scene: `温馨学习角落，${titleKeywords || '书架背景'}，暖色环境光`
     }
   }
 
   const defaultPrompts: Record<ImageType, string> = {
-    cover: `product photography, ${titleKeywords || 'clean arrangement'}, soft lighting, professional photography`,
-    detail: `close-up detail shot, ${titleKeywords || 'texture and material'}, macro photography`,
-    scene: `lifestyle scene, ${titleKeywords || 'cozy atmosphere'}, natural lighting`
+    cover: `产品摄影，${titleKeywords || '整洁摆放'}，柔和灯光，专业摄影`,
+    detail: `细节特写，${titleKeywords || '质感和材质'}，微距摄影`,
+    scene: `生活场景，${titleKeywords || '温馨氛围'}，自然光线`
   }
 
   const prompts = categoryStyles[category] || defaultPrompts
   const basePrompt = prompts[imageType]
 
-  return `${basePrompt}, high detail, 4K resolution, no text, no watermark, no logo, no human, no person, no face, no portrait`
+  return `${basePrompt}，高清细节，4K分辨率，无文字，无水印，无logo，无人物，无人脸`
 }
 
 /**

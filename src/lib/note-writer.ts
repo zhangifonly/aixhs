@@ -131,7 +131,7 @@ export async function* generateNoteStream(
   })
 
   const messages: Message[] = [
-    { role: 'user', content: `请写一篇关于「${topic}」的小红书笔记` }
+    { role: 'user', content: `请写一篇关于「${topic}」的小红薯笔记` }
   ]
 
   const stream = createChatStream(messages, {
